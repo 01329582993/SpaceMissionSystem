@@ -1,5 +1,11 @@
 CSE 4508 Semester Project .
 
+Tuplex team: 
+
+-220041106
+-220041158
+-220041165
+
 Space Mission Management System
 Database Project – README
 
@@ -14,5 +20,4 @@ Accurate, secure data storage
 
 Real‑time monitoring capabilities
 
-Automated workflows using triggers and procedures
-
+Automated workflows using triggers and procedures.
