@@ -1,36 +1,32 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SpaceMissionSystem / CosmoTrack
 
-## Getting Started
+## Member A – Database Setup (No Docker)
 
-First, run the development server:
+### Prerequisites
+- PostgreSQL installed locally
+- pgAdmin (recommended) or psql CLI
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+### 1) Create the database
+Create a PostgreSQL database named:
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- **cosmotrack**
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+In pgAdmin:
+- Servers → PostgreSQL → Databases → Create → Database → name: `cosmotrack`
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 2) Run SQL scripts (pgAdmin Query Tool)
+Open `cosmotrack` → Query Tool, then run in this order:
 
-## Learn More
+1. `sql/01_schema.sql`
+2. `sql/02_seed.sql`
+3. `sql/08_indexes.sql`
 
-To learn more about Next.js, take a look at the following resources:
+### 3) Verification queries
+Run these to confirm everything is correct:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```sql
+SELECT COUNT(*) FROM Mission;        -- expect 3
+SELECT COUNT(*) FROM Spacecraft;     -- expect 3
+SELECT COUNT(*) FROM Telemetry;      -- expect ~100
+SELECT * FROM Alert ORDER BY created_at DESC;
+SELECT * FROM Communication_Window;
