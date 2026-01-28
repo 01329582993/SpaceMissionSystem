@@ -1,4 +1,3 @@
--- sql/01_schema.sql
 BEGIN;
 
 DROP TABLE IF EXISTS Communication_Window CASCADE;
@@ -93,6 +92,123 @@ CREATE TABLE Experiment (
     name VARCHAR(100) NOT NULL,
     status VARCHAR(30),
     result_data BYTEA
+);
+
+-- Astronaut table
+CREATE TABLE Astronaut (
+    astronaut_id SERIAL PRIMARY KEY,
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
+    email VARCHAR(100),
+    specialization VARCHAR(100),
+    years_experience INT,
+    status VARCHAR(30),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- App User table
+CREATE TABLE App_User (
+    user_id SERIAL PRIMARY KEY,
+    username VARCHAR(100) NOT NULL UNIQUE,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    role VARCHAR(30) NOT NULL CHECK (role IN ('admin', 'operator', 'analyst')),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    last_login TIMESTAMP
+);
+
+-- Audit Log table
+CREATE TABLE Audit_Log (
+    log_id SERIAL PRIMARY KEY,
+    user_id INT NOT NULL REFERENCES App_User(user_id) ON DELETE SET NULL,
+    action VARCHAR(100) NOT NULL,
+    entity_type VARCHAR(50),
+    entity_id INT,
+    details TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Launch Site table
+CREATE TABLE Launch_Site (
+    launch_site_id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL UNIQUE,
+    location VARCHAR(200),
+    country VARCHAR(50),
+    capabilities TEXT
+);
+
+-- Launch table
+CREATE TABLE Launch (
+    launch_id SERIAL PRIMARY KEY,
+    mission_id INT NOT NULL REFERENCES Mission(mission_id) ON DELETE CASCADE,
+    launch_site_id INT NOT NULL REFERENCES Launch_Site(launch_site_id) ON DELETE RESTRICT,
+    launch_date TIMESTAMP,
+    status VARCHAR(30),
+    notes TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Maintenance Schedule table
+CREATE TABLE Maintenance_Schedule (
+    schedule_id SERIAL PRIMARY KEY,
+    spacecraft_id INT NOT NULL REFERENCES Spacecraft(spacecraft_id) ON DELETE CASCADE,
+    start_time TIMESTAMP NOT NULL,
+    end_time TIMESTAMP NOT NULL,
+    subsystem_id INT REFERENCES Spacecraft_Subsystem(subsystem_id) ON DELETE SET NULL,
+    maintenance_type VARCHAR(50),
+    status VARCHAR(30),
+    notes TEXT,
+    CHECK (end_time >= start_time)
+);
+
+-- Ground Station Schedule table
+CREATE TABLE Ground_Station_Schedule (
+    schedule_id SERIAL PRIMARY KEY,
+    station_id INT NOT NULL REFERENCES Ground_Station(station_id) ON DELETE CASCADE,
+    start_time TIMESTAMP NOT NULL,
+    end_time TIMESTAMP NOT NULL,
+    purpose VARCHAR(100),
+    status VARCHAR(30),
+    notes TEXT,
+    CHECK (end_time >= start_time)
+);
+
+-- Mission Crew join table
+CREATE TABLE Mission_Crew (
+    mission_crew_id SERIAL PRIMARY KEY,
+    mission_id INT NOT NULL REFERENCES Mission(mission_id) ON DELETE CASCADE,
+    astronaut_id INT NOT NULL REFERENCES Astronaut(astronaut_id) ON DELETE CASCADE,
+    role VARCHAR(50),
+    assignment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(mission_id, astronaut_id)
+);
+
+-- Mission Experiments join table
+CREATE TABLE Mission_Experiments (
+    mission_exp_id SERIAL PRIMARY KEY,
+    mission_id INT NOT NULL REFERENCES Mission(mission_id) ON DELETE CASCADE,
+    experiment_id INT NOT NULL REFERENCES Experiment(experiment_id) ON DELETE CASCADE,
+    UNIQUE(mission_id, experiment_id)
+);
+
+-- Mission Spacecraft Assignment join table
+CREATE TABLE Mission_Spacecraft_Assignment (
+    assignment_id SERIAL PRIMARY KEY,
+    mission_id INT NOT NULL REFERENCES Mission(mission_id) ON DELETE CASCADE,
+    spacecraft_id INT NOT NULL REFERENCES Spacecraft(spacecraft_id) ON DELETE CASCADE,
+    role VARCHAR(50),
+    assignment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(mission_id, spacecraft_id)
+);
+
+-- Mission Timeline table
+CREATE TABLE Mission_Timeline (
+    timeline_id SERIAL PRIMARY KEY,
+    mission_id INT NOT NULL REFERENCES Mission(mission_id) ON DELETE CASCADE,
+    event_name VARCHAR(100) NOT NULL,
+    event_date TIMESTAMP,
+    description TEXT,
+    status VARCHAR(30),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 COMMIT;

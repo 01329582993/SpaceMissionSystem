@@ -81,4 +81,89 @@ VALUES
 (2, 'Radiation Exposure', 'running', NULL),
 (3, 'Sample Spectroscopy', 'completed', decode('DEADBEEF','hex'));
 
+-- Astronauts (5+)
+INSERT INTO Astronaut(first_name, last_name, email, specialization, years_experience, status, created_at)
+VALUES
+('Neil', 'Armstrong', 'neil.armstrong@space.gov', 'Planetary Science', 15, 'active', CURRENT_TIMESTAMP),
+('Buzz', 'Aldrin', 'buzz.aldrin@space.gov', 'Orbital Mechanics', 14, 'active', CURRENT_TIMESTAMP - interval '1 day'),
+('Yuri', 'Gagarin', 'yuri.gagarin@space.gov', 'Flight Operations', 12, 'retired', CURRENT_TIMESTAMP - interval '2 days'),
+('Sally', 'Ride', 'sally.ride@space.gov', 'Engineering', 13, 'active', CURRENT_TIMESTAMP - interval '3 days'),
+('Alan', 'Bean', 'alan.bean@space.gov', 'Geology', 11, 'active', CURRENT_TIMESTAMP - interval '4 days'),
+('Valentina', 'Tereshkova', 'valentina.tereshkova@space.gov', 'Systems Engineering', 10, 'retired', CURRENT_TIMESTAMP - interval '5 days');
+
+-- App Users (3: admin, operator, analyst)
+INSERT INTO App_User(username, email, role, created_at, last_login)
+VALUES
+('admin_user', 'admin@mission.local', 'admin', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('operator_team', 'operator@mission.local', 'operator', CURRENT_TIMESTAMP - interval '1 hour', CURRENT_TIMESTAMP - interval '30 minutes'),
+('analyst_data', 'analyst@mission.local', 'analyst', CURRENT_TIMESTAMP - interval '2 hours', CURRENT_TIMESTAMP - interval '1 hour');
+
+-- Launch Sites (2+)
+INSERT INTO Launch_Site(name, location, country, capabilities)
+VALUES
+('Kennedy Space Center', 'Cape Canaveral, Florida', 'USA', 'Heavy lift, manned missions'),
+('Baikonur Cosmodrome', 'Baikonur, Kazakhstan', 'Kazakhstan', 'All classes, highest cadence');
+
+-- Launches (3)
+INSERT INTO Launch(mission_id, launch_site_id, launch_date, status, notes, created_at)
+VALUES
+(1, 1, CURRENT_TIMESTAMP + interval '5 days', 'scheduled', 'First launch for Lunar Survey', CURRENT_TIMESTAMP),
+(2, 2, CURRENT_TIMESTAMP - interval '5 days', 'completed', 'Successfully reached Mars relay orbit', CURRENT_TIMESTAMP - interval '6 days'),
+(3, 1, CURRENT_TIMESTAMP - interval '120 days', 'completed', 'Asteroid sample return mission', CURRENT_TIMESTAMP - interval '121 days');
+
+-- Maintenance Schedule (5+)
+INSERT INTO Maintenance_Schedule(spacecraft_id, start_time, end_time, subsystem_id, maintenance_type, status, notes)
+VALUES
+(1, CURRENT_TIMESTAMP + interval '2 days', CURRENT_TIMESTAMP + interval '2 days 4 hours', 1, 'Preventive', 'scheduled', 'Power system check'),
+(1, CURRENT_TIMESTAMP + interval '4 days', CURRENT_TIMESTAMP + interval '4 days 6 hours', 2, 'Preventive', 'scheduled', 'Navigation calibration'),
+(2, CURRENT_TIMESTAMP + interval '1 day', CURRENT_TIMESTAMP + interval '1 day 3 hours', 6, 'Corrective', 'in-progress', 'Comms antenna repair'),
+(2, CURRENT_TIMESTAMP + interval '3 days', CURRENT_TIMESTAMP + interval '3 days 2 hours', 5, 'Preventive', 'scheduled', 'Power supply inspection'),
+(3, CURRENT_TIMESTAMP + interval '7 days', CURRENT_TIMESTAMP + interval '7 days 5 hours', 9, 'Preventive', 'scheduled', 'Full system health check'),
+(3, CURRENT_TIMESTAMP + interval '10 days', CURRENT_TIMESTAMP + interval '10 days 4 hours', 10, 'Preventive', 'scheduled', 'Navigation system audit');
+
+-- Ground Station Schedule (5+)
+INSERT INTO Ground_Station_Schedule(station_id, start_time, end_time, purpose, status, notes)
+VALUES
+(1, CURRENT_TIMESTAMP + interval '6 hours', CURRENT_TIMESTAMP + interval '8 hours', 'Communication window', 'scheduled', 'Canberra link to Odyssey'),
+(2, CURRENT_TIMESTAMP + interval '12 hours', CURRENT_TIMESTAMP + interval '14 hours', 'Data downlink', 'scheduled', 'Nairobi data reception'),
+(3, CURRENT_TIMESTAMP + interval '18 hours', CURRENT_TIMESTAMP + interval '20 hours', 'Command uplink', 'scheduled', 'Madrid command transmission'),
+(1, CURRENT_TIMESTAMP + interval '24 hours', CURRENT_TIMESTAMP + interval '26 hours', 'Telemetry', 'scheduled', 'Canberra telemetry collection'),
+(2, CURRENT_TIMESTAMP + interval '36 hours', CURRENT_TIMESTAMP + interval '38 hours', 'System check', 'scheduled', 'Nairobi system verification');
+
+-- Mission Crew assignments
+INSERT INTO Mission_Crew(mission_id, astronaut_id, role, assignment_date)
+VALUES
+(1, 1, 'Commander', CURRENT_TIMESTAMP - interval '30 days'),
+(1, 2, 'Pilot', CURRENT_TIMESTAMP - interval '30 days'),
+(1, 4, 'Mission Specialist', CURRENT_TIMESTAMP - interval '25 days'),
+(2, 3, 'Flight Engineer', CURRENT_TIMESTAMP - interval '45 days'),
+(2, 5, 'Payload Specialist', CURRENT_TIMESTAMP - interval '40 days'),
+(3, 1, 'Sample Collection', CURRENT_TIMESTAMP - interval '130 days'),
+(3, 6, 'Data Analysis', CURRENT_TIMESTAMP - interval '125 days');
+
+-- Mission Experiments
+INSERT INTO Mission_Experiments(mission_id, experiment_id)
+VALUES
+(1, 1),
+(2, 2),
+(3, 3);
+
+-- Mission Spacecraft Assignments
+INSERT INTO Mission_Spacecraft_Assignment(mission_id, spacecraft_id, role, assignment_date)
+VALUES
+(1, 1, 'Primary Lander', CURRENT_TIMESTAMP - interval '60 days'),
+(2, 2, 'Relay Satellite', CURRENT_TIMESTAMP - interval '90 days'),
+(3, 3, 'Sample Return Vehicle', CURRENT_TIMESTAMP - interval '150 days');
+
+-- Mission Timeline events
+INSERT INTO Mission_Timeline(mission_id, event_name, event_date, description, status, created_at)
+VALUES
+(1, 'Launch', CURRENT_TIMESTAMP + interval '5 days', 'Mission launch from Kennedy Space Center', 'scheduled', CURRENT_TIMESTAMP),
+(1, 'Lunar Orbit Insertion', CURRENT_TIMESTAMP + interval '7 days', 'Enter lunar orbit', 'scheduled', CURRENT_TIMESTAMP),
+(1, 'Landing Site Selection', CURRENT_TIMESTAMP + interval '9 days', 'Confirm landing coordinates', 'scheduled', CURRENT_TIMESTAMP),
+(2, 'Relay Deployment', CURRENT_TIMESTAMP - interval '2 days', 'Deploy communication relay satellite', 'in-progress', CURRENT_TIMESTAMP - interval '3 days'),
+(2, 'Signal Acquisition', CURRENT_TIMESTAMP + interval '10 days', 'First signal received at Earth stations', 'scheduled', CURRENT_TIMESTAMP),
+(3, 'Sample Return', CURRENT_TIMESTAMP - interval '95 days', 'Samples arrived at Earth', 'completed', CURRENT_TIMESTAMP - interval '100 days'),
+(3, 'Analysis Complete', CURRENT_TIMESTAMP - interval '90 days', 'Laboratory analysis finished', 'completed', CURRENT_TIMESTAMP - interval '92 days');
+
 COMMIT;
