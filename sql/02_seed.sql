@@ -81,4 +81,14 @@ VALUES
 (2, 'Radiation Exposure', 'running', NULL),
 (3, 'Sample Spectroscopy', 'completed', decode('DEADBEEF','hex'));
 
+-- Astronauts
+INSERT INTO Astronaut(name, role, availability)
+VALUES
+('Commander Sarah Chen', 'Mission Commander', 'on-mission'),
+('Dr. James Morrison', 'Science Officer', 'available'),
+('Lt. Maya Rodriguez', 'Pilot', 'on-mission'),
+('Engineer Tom Wu', 'Systems Engineer', 'available'),
+('Dr. Lisa Patel', 'Medical Officer', 'on-leave'),
+('Specialist Alex Kim', 'Communications', 'available');
+
 COMMIT;

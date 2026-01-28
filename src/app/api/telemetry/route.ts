@@ -1,26 +1,20 @@
 import { NextResponse } from "next/server";
-import pool from "@/src/lib/db";
+import { pool } from "@/src/lib/db";
 
+export const runtime = "nodejs";
 
 export async function GET() {
-  const result = await pool.query(
-    "SELECT * FROM telemetry ORDER BY recorded_at DESC LIMIT 20"
-  );
-  return NextResponse.json(result.rows);
-}
+  try {
+    const result = await pool.query(`
+      SELECT t.telemetry_id, t.spacecraft_id, t.temperature, t.voltage, t.fuel_level, t.radiation, t.recorded_at
+      FROM telemetry t
+      ORDER BY t.recorded_at DESC
+      LIMIT 50;
+    `);
 
-
-export async function POST(req: Request) {
-  const body = await req.json();
-  const { mission_id, temperature, battery, fuel, signal } = body;
-
-  const result = await pool.query(
-    `INSERT INTO telemetry
-     (mission_id, temperature, battery, fuel, signal)
-     VALUES ($1,$2,$3,$4,$5)
-     RETURNING *`,
-    [mission_id, temperature, battery, fuel, signal]
-  );
-
-  return NextResponse.json(result.rows[0]);
+    return NextResponse.json(result.rows);
+  } catch (err: any) {
+    console.error("TELEMETRY ERROR:", err.message);
+    return NextResponse.json([], { status: 200 });
+  }
 }

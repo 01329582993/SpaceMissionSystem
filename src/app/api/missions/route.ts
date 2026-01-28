@@ -1,10 +1,13 @@
-import prisma from "@/src/lib/prisma";
+import { NextResponse } from "next/server";
+import { pool } from "@/src/lib/db";
 
 export async function GET() {
-  return Response.json(await prisma.mission.findMany());
-}
-
-export async function POST(req: Request) {
-  const data = await req.json();
-  return Response.json(await prisma.mission.create({ data }));
+  try {
+    
+    const result = await pool.query("SELECT * FROM mission_dashboard ORDER BY mission_id DESC");
+    return NextResponse.json(result.rows);
+  } catch (error) {
+    console.error("Database Error:", error);
+    return NextResponse.json({ error: "Failed to fetch missions" }, { status: 500 });
+  }
 }

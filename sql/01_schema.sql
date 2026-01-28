@@ -1,4 +1,3 @@
--- sql/01_schema.sql
 BEGIN;
 
 DROP TABLE IF EXISTS Communication_Window CASCADE;
@@ -10,6 +9,7 @@ DROP TABLE IF EXISTS Spacecraft CASCADE;
 DROP TABLE IF EXISTS Experiment CASCADE;
 DROP TABLE IF EXISTS Mission_Phase CASCADE;
 DROP TABLE IF EXISTS Ground_Station CASCADE;
+DROP TABLE IF EXISTS Astronaut CASCADE;
 DROP TABLE IF EXISTS Mission CASCADE;
 
 CREATE TABLE Mission (
@@ -93,6 +93,13 @@ CREATE TABLE Experiment (
     name VARCHAR(100) NOT NULL,
     status VARCHAR(30),
     result_data BYTEA
+);
+
+CREATE TABLE Astronaut (
+    astronaut_id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    role VARCHAR(50),
+    availability VARCHAR(30) DEFAULT 'available'
 );
 
 COMMIT;

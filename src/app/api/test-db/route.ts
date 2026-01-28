@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { Pool } from "pg";
 
-export const runtime = "nodejs"; // IMPORTANT: make sure it runs in Node (not edge)
+export const runtime = "nodejs"; 
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -9,7 +9,7 @@ const pool = new Pool({
 
 export async function GET() {
   try {
-    // 1) confirm env is loaded
+ 
     if (!process.env.DATABASE_URL) {
       return NextResponse.json(
         { ok: false, error: "DATABASE_URL is missing in env" },
@@ -17,12 +17,11 @@ export async function GET() {
       );
     }
 
-    // 2) test basic query
   const result = await pool.query("SELECT * FROM spacecraft ORDER BY spacecraft_id LIMIT 10");
 
     return NextResponse.json({ ok: true, rows: result.rows });
   } catch (err: any) {
-    console.error("DB ERROR:", err); // shows full error in terminal
+    console.error("DB ERROR:", err); 
     return NextResponse.json(
       {
         ok: false,

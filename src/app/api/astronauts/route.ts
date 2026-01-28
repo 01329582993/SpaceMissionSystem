@@ -1,21 +1,18 @@
 import { NextResponse } from "next/server";
-import pool from "@/src/lib/db";
+import { pool } from "@/src/lib/db";
+
+export const runtime = "nodejs";
 
 export async function GET() {
-  const result = await pool.query("SELECT * FROM astronaut");
-  return NextResponse.json(result.rows);
-}
-
-export async function POST(req: Request) {
-  const body = await req.json();
-  const { name, role, availability } = body;
-
-  const result = await pool.query(
-    `INSERT INTO astronaut (name, role, availability)
-     VALUES ($1,$2,$3)
-     RETURNING *`,
-    [name, role, availability]
-  );
-
-  return NextResponse.json(result.rows[0]);
+  try {
+    const result = await pool.query(`
+      SELECT astronaut_id, name, role, availability
+      FROM astronaut
+      ORDER BY name
+    `);
+    return NextResponse.json(result.rows);
+  } catch (err: any) {
+    console.error("ASTRONAUT ERROR:", err.message);
+    return NextResponse.json([], { status: 200 });
+  }
 }

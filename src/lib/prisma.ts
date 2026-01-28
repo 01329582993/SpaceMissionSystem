@@ -1,9 +1,3 @@
-import { PrismaClient } from "../../../generated/prisma/client";
+import pool from "./db";
 
-const globalForPrisma = global as unknown as { prisma: InstanceType<typeof PrismaClient> };
-
-const prisma = globalForPrisma.prisma || new (PrismaClient as any)();
-
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
-
-export default prisma;
+export default pool;
