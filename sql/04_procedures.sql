@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 -- sql/04_procedures.sql
 
 -- 1. Generate Mission Code
@@ -87,5 +88,17 @@ EXCEPTION
     WHEN OTHERS THEN
         RAISE NOTICE 'Transaction failed: %', SQLERRM;
         RAISE; -- Re-raise to rollback
+=======
+-- Create mission procedure
+CREATE OR REPLACE PROCEDURE create_mission(
+    m_name VARCHAR,
+    m_objectives TEXT
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    INSERT INTO Mission(name, status, objectives)
+    VALUES (m_name, 'planned', m_objectives);
+>>>>>>> origin/zinnia-progress
 END;
 $$;

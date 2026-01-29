@@ -1,8 +1,13 @@
+<<<<<<< HEAD
 -- sql/01_schema.sql
 BEGIN;
 
 -- 1. Cleanup
 DROP TABLE IF EXISTS AuditLog CASCADE;
+=======
+BEGIN;
+
+>>>>>>> origin/zinnia-progress
 DROP TABLE IF EXISTS Communication_Window CASCADE;
 DROP TABLE IF EXISTS Alert CASCADE;
 DROP TABLE IF EXISTS Telemetry CASCADE;
@@ -12,6 +17,7 @@ DROP TABLE IF EXISTS Spacecraft CASCADE;
 DROP TABLE IF EXISTS Experiment CASCADE;
 DROP TABLE IF EXISTS Mission_Phase CASCADE;
 DROP TABLE IF EXISTS Ground_Station CASCADE;
+<<<<<<< HEAD
 DROP TABLE IF EXISTS Mission CASCADE;
 DROP TABLE IF EXISTS Users CASCADE;
 
@@ -34,6 +40,18 @@ CREATE TABLE Mission (
     end_date DATE,
     objectives TEXT,
     created_by INT REFERENCES Users(user_id),
+=======
+DROP TABLE IF EXISTS Astronaut CASCADE;
+DROP TABLE IF EXISTS Mission CASCADE;
+
+CREATE TABLE Mission (
+    mission_id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    status VARCHAR(30),
+    start_date DATE,
+    end_date DATE,
+    objectives TEXT,
+>>>>>>> origin/zinnia-progress
     CHECK (end_date IS NULL OR start_date IS NULL OR end_date >= start_date)
 );
 
@@ -43,23 +61,34 @@ CREATE TABLE Mission_Phase (
     phase_name VARCHAR(50) NOT NULL,
     start_time TIMESTAMP,
     end_time TIMESTAMP,
+<<<<<<< HEAD
     status VARCHAR(30) DEFAULT 'Pending',
+=======
+>>>>>>> origin/zinnia-progress
     CHECK (end_time IS NULL OR start_time IS NULL OR end_time >= start_time)
 );
 
 CREATE TABLE Spacecraft (
     spacecraft_id SERIAL PRIMARY KEY,
+<<<<<<< HEAD
     name VARCHAR(100) NOT NULL UNIQUE,
     model VARCHAR(50),
     fuel_level NUMERIC CHECK (fuel_level IS NULL OR (fuel_level >= 0 AND fuel_level <= 100)),
     health_status VARCHAR(30) DEFAULT 'Operational',
     current_mission_id INT REFERENCES Mission(mission_id) ON DELETE SET NULL,
     manufactured_date DATE
+=======
+    name VARCHAR(100) NOT NULL,
+    fuel_level NUMERIC CHECK (fuel_level IS NULL OR fuel_level >= 0),
+    health_status VARCHAR(30),
+    mission_id INT REFERENCES Mission(mission_id) ON DELETE SET NULL
+>>>>>>> origin/zinnia-progress
 );
 
 CREATE TABLE Spacecraft_Subsystem (
     subsystem_id SERIAL PRIMARY KEY,
     spacecraft_id INT NOT NULL REFERENCES Spacecraft(spacecraft_id) ON DELETE CASCADE,
+<<<<<<< HEAD
     name VARCHAR(50) NOT NULL, -- e.g., 'Propulsion', 'Life Support'
     health_score INT CHECK (health_score BETWEEN 0 AND 100),
     status VARCHAR(30) DEFAULT 'Operational',
@@ -68,13 +97,24 @@ CREATE TABLE Spacecraft_Subsystem (
 );
 
 -- 4. Operational Tables
+=======
+    name VARCHAR(50) NOT NULL,
+    health_score INT CHECK (health_score BETWEEN 0 AND 100),
+    UNIQUE(spacecraft_id, name)
+);
+
+>>>>>>> origin/zinnia-progress
 CREATE TABLE Maintenance_Log (
     log_id SERIAL PRIMARY KEY,
     subsystem_id INT NOT NULL REFERENCES Spacecraft_Subsystem(subsystem_id) ON DELETE CASCADE,
     description TEXT NOT NULL,
+<<<<<<< HEAD
     technician_id INT REFERENCES Users(user_id),
     log_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     next_maintenance_due DATE
+=======
+    log_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+>>>>>>> origin/zinnia-progress
 );
 
 CREATE TABLE Telemetry (
@@ -91,16 +131,24 @@ CREATE TABLE Alert (
     alert_id SERIAL PRIMARY KEY,
     spacecraft_id INT NOT NULL REFERENCES Spacecraft(spacecraft_id) ON DELETE CASCADE,
     message TEXT NOT NULL,
+<<<<<<< HEAD
     severity VARCHAR(20) NOT NULL CHECK (severity IN ('Low','Medium','High','Critical')),
     is_resolved BOOLEAN DEFAULT FALSE,
+=======
+    severity VARCHAR(20) NOT NULL CHECK (severity IN ('low','medium','high','critical')),
+>>>>>>> origin/zinnia-progress
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE Ground_Station (
     station_id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL UNIQUE,
+<<<<<<< HEAD
     location TEXT,
     status VARCHAR(30) DEFAULT 'Active'
+=======
+    location TEXT
+>>>>>>> origin/zinnia-progress
 );
 
 CREATE TABLE Communication_Window (
@@ -116,6 +164,7 @@ CREATE TABLE Experiment (
     experiment_id SERIAL PRIMARY KEY,
     mission_id INT NOT NULL REFERENCES Mission(mission_id) ON DELETE CASCADE,
     name VARCHAR(100) NOT NULL,
+<<<<<<< HEAD
     status VARCHAR(30) DEFAULT 'Planned',
     lead_scientist_id INT REFERENCES Users(user_id),
     result_data BYTEA
@@ -141,6 +190,17 @@ CREATE TABLE AuditLog (
     changed_by INT REFERENCES Users(user_id), -- If we can track the user
     changed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     details TEXT
+=======
+    status VARCHAR(30),
+    result_data BYTEA
+);
+
+CREATE TABLE Astronaut (
+    astronaut_id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    role VARCHAR(50),
+    availability VARCHAR(30) DEFAULT 'available'
+>>>>>>> origin/zinnia-progress
 );
 
 COMMIT;

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 -- sql/05_triggers.sql
 
 -- 1. Prevent Overlapping Spacecraft Assignments
@@ -104,3 +105,16 @@ CREATE TRIGGER trg_log_maintenance_changes
 AFTER INSERT OR UPDATE OR DELETE ON Maintenance_Log
 FOR EACH ROW
 EXECUTE FUNCTION fn_audit_maintenance();
+=======
+-- Trigger for Telemetry
+CREATE TRIGGER trg_telemetry_alert
+AFTER INSERT ON Telemetry
+FOR EACH ROW
+EXECUTE FUNCTION telemetry_alert();
+
+-- Trigger for Communication Window
+CREATE TRIGGER trg_no_overlap
+BEFORE INSERT ON Communication_Window
+FOR EACH ROW
+EXECUTE FUNCTION prevent_overlap();
+>>>>>>> origin/zinnia-progress
