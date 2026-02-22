@@ -3,6 +3,7 @@ import Link from 'next/link';
 import CrewAssignmentForm from '@/src/components/CrewAssignmentForm';
 import MissionTelemetryChart from '@/src/components/MissionTelemetryChart';
 import MissionPhaseTimeline from '@/src/components/MissionPhaseTimeline';
+import LaunchButton from '@/src/components/LaunchButton';
 
 async function getMissionFullDetails(id: string) {
   try {
@@ -90,6 +91,7 @@ export default async function MissionDetails({ params }: { params: Promise<{ id:
             <p style={{ color: '#888' }}>No crew assigned to this mission.</p>
           )}
 
+          <LaunchButton missionId={mId} status={info.status} />
           <CrewAssignmentForm missionId={mId} />
         </aside>
 

@@ -10,6 +10,7 @@ const navItems = [
   { name: "Fleet", href: "/spacecraft" },
   { name: "Personnel", href: "/personnel" },
   { name: "Alerts", href: "/alerts" },
+  { name: "Logs", href: "/logs" },
 ];
 
 

@@ -1,12 +1,13 @@
 import Link from 'next/link';
 import { pool } from '@/src/lib/db';
+import AnalyticsDashboard from '@/src/components/AnalyticsDashboard';
 
 async function getMissions() {
   try {
-    const result = await pool.query("SELECT * FROM mission_dashboard ORDER BY mission_id DESC");
-    return result.rows;
-  } catch (err) {
-    console.error("Dashboard DB Error:", err);
+    const result = await pool.query("SELECT * FROM mission_dashboard ORDER BY start_date DESC");
+    return result.rows || [];
+  } catch (error) {
+    console.error("Database query error:", error);
     return [];
   }
 }
@@ -35,7 +36,10 @@ export default async function DashboardPage() {
         </Link>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '25px', marginTop: '30px' }}>
+      {/* Dashboard Stats */}
+      <AnalyticsDashboard />
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: '25px', marginTop: '30px' }}>
         {missions.map((m: any) => (
           <div key={m.mission_id} style={{ backgroundColor: '#1b1d29', padding: '25px', borderRadius: '12px', border: '1px solid #2a2d3e' }}>
             <h2 style={{ margin: '0 0 10px 0' }}>{m.mission_name}</h2>
