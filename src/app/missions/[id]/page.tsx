@@ -1,6 +1,8 @@
 import pool from "@/src/lib/db";
 import Link from 'next/link';
 import CrewAssignmentForm from '@/src/components/CrewAssignmentForm';
+import MissionTelemetryChart from '@/src/components/MissionTelemetryChart';
+import MissionPhaseTimeline from '@/src/components/MissionPhaseTimeline';
 
 async function getMissionFullDetails(id: string) {
   try {
@@ -53,6 +55,7 @@ export default async function MissionDetails({ params }: { params: Promise<{ id:
       <div style={{ marginTop: '30px', display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '30px' }}>
 
         <div>
+          <MissionPhaseTimeline missionId={mId} />
           <section style={{ backgroundColor: '#1b1d29', padding: '25px', borderRadius: '15px', marginBottom: '30px' }}>
             <h2 style={{ color: '#4cc9f0', marginTop: '0' }}>Primary Objective</h2>
             <p style={{ lineHeight: '1.6', fontSize: '1.1rem' }}>{info.objective || "No objective data available."}</p>
@@ -69,6 +72,8 @@ export default async function MissionDetails({ params }: { params: Promise<{ id:
               </div>
             ))}
           </div>
+
+          <MissionTelemetryChart missionId={mId} />
         </div>
 
 
