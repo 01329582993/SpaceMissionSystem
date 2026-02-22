@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { pool } from '@/src/lib/db';
+import CosmoLayout from '@/src/components/CosmoLayout';
 
 async function getPersonnel() {
     try {
@@ -19,84 +20,79 @@ export default async function PersonnelPage() {
     const staff = await getPersonnel();
 
     return (
-        <div style={{
-            padding: '40px',
-            backgroundColor: '#0b0d17',
-            minHeight: '100vh',
-            color: 'white',
-            fontFamily: 'sans-serif',
-            paddingBottom: '100px'
-        }}>
-            <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px' }}>
-                <div>
-                    <h1 style={{ margin: 0, fontSize: '2.5rem', fontWeight: '800' }}>PERSONNEL ROSTER</h1>
-                    <p style={{ color: '#4cc9f0', margin: '5px 0 0 0' }}>ACTIVE DUTY OFFICERS: {staff.length}</p>
-                </div>
-                <div style={{ display: 'flex', gap: '15px' }}>
+        <CosmoLayout>
+            <div style={{ padding: '60px', color: 'white', fontFamily: 'sans-serif' }}>
+                <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '20px' }}>
+                    <div>
+                        <h1 style={{ margin: 0, fontSize: '2.5rem', fontWeight: '800', color: '#4cc9f0', letterSpacing: '-1px' }}>PERSONNEL ROSTER</h1>
+                        <p style={{ color: 'rgba(255,255,255,0.5)', margin: '5px 0 0 0', textTransform: 'uppercase', letterSpacing: '2px', fontSize: '0.8rem' }}>ACTIVE DUTY OFFICERS: {staff.length}</p>
+                    </div>
+
                     <Link href="/personnel/new" style={{
-                        padding: '10px 20px',
+                        padding: '14px 28px',
                         backgroundColor: '#4cc9f0',
                         color: '#0b0d17',
                         textDecoration: 'none',
-                        borderRadius: '4px',
+                        borderRadius: '10px',
                         fontWeight: 'bold',
                         fontSize: '0.9rem',
-                        textTransform: 'uppercase'
+                        textTransform: 'uppercase',
+                        letterSpacing: '1px',
+                        boxShadow: '0 0 20px rgba(76, 201, 240, 0.3)'
                     }}>
                         + Register Officer
                     </Link>
-                    <Link href="/dashboard" style={{
-                        padding: '10px 20px',
-                        border: '1px solid #4cc9f0',
-                        color: '#4cc9f0',
-                        textDecoration: 'none',
-                        borderRadius: '4px',
-                        fontWeight: 'bold'
-                    }}>
-                        RETURN TO COMMAND
-                    </Link>
-                </div>
-            </header>
+                </header>
 
-            <div style={{ backgroundColor: '#161925', borderRadius: '12px', border: '1px solid #2a2d3e', overflow: 'hidden' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                    <thead>
-                        <tr style={{ backgroundColor: '#1b1d29', borderBottom: '2px solid #2a2d3e' }}>
-                            <th style={{ padding: '20px', color: '#4cc9f0' }}>OFFICER NAME</th>
-                            <th style={{ padding: '20px', color: '#4cc9f0' }}>ROLE</th>
-                            <th style={{ padding: '20px', color: '#4cc9f0' }}>STATUS</th>
-                            <th style={{ padding: '20px', textAlign: 'right', color: '#4cc9f0' }}>ID</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {staff.map((a: any) => (
-                            <tr key={a.astronaut_id} style={{ borderBottom: '1px solid #2a2d3e' }}>
-                                <td style={{ padding: '20px', fontWeight: 'bold' }}>{a.name.toUpperCase()}</td>
-                                <td style={{ padding: '20px', color: '#ccc' }}>{a.role}</td>
-                                <td style={{ padding: '20px' }}>
-                                    <span style={{
-                                        color: a.availability === 'Available' ? '#10b981' : '#f72585',
-                                        fontSize: '0.85rem',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '8px'
-                                    }}>
-                                        <span style={{
-                                            width: '8px', height: '8px', borderRadius: '50%',
-                                            backgroundColor: a.availability === 'Available' ? '#10b981' : '#f72585',
-                                            boxShadow: `0 0 8px ${a.availability === 'Available' ? '#10b981' : '#f72585'}`
-                                        }}></span>
-                                        {a.availability.toUpperCase()}
-                                    </span>
-                                </td>
-                                <td style={{ padding: '20px', textAlign: 'right', color: '#555' }}>
-                                    #{a.astronaut_id}
-                                </td>
+                <div style={{
+                    backgroundColor: 'rgba(22, 25, 37, 0.7)',
+                    backdropFilter: 'blur(10px)',
+                    borderRadius: '20px',
+                    border: '1px solid rgba(255,255,255,0.05)',
+                    overflow: 'hidden'
+                }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                        <thead>
+                            <tr style={{ backgroundColor: 'rgba(76, 201, 240, 0.1)', color: '#4cc9f0', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '1px' }}>
+                                <th style={{ padding: '25px' }}>OFFICER NAME</th>
+                                <th style={{ padding: '25px' }}>DESIGNATION</th>
+                                <th style={{ padding: '25px' }}>OPERATIONAL STATUS</th>
+                                <th style={{ padding: '25px', textAlign: 'right' }}>ASSET ID</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {staff.map((a: any) => (
+                                <tr key={a.astronaut_id} style={{ borderBottom: '1px solid rgba(255,255,255,0.03)', transition: 'background 0.3s ease' }}>
+                                    <td style={{ padding: '25px', fontWeight: '700', fontSize: '1.1rem' }}>{a.name.toUpperCase()}</td>
+                                    <td style={{ padding: '25px', color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', fontSize: '0.85rem' }}>{a.role}</td>
+                                    <td style={{ padding: '25px' }}>
+                                        <span style={{
+                                            color: a.availability === 'Available' ? '#10b981' : '#f72585',
+                                            fontSize: '0.85rem',
+                                            fontWeight: '800',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '10px',
+                                            letterSpacing: '1px'
+                                        }}>
+                                            <span style={{
+                                                width: '10px', height: '10px', borderRadius: '50%',
+                                                backgroundColor: a.availability === 'Available' ? '#10b981' : '#f72585',
+                                                boxShadow: `0 0 10px ${a.availability === 'Available' ? '#10b981' : '#f72585'}`
+                                            }}></span>
+                                            {a.availability.toUpperCase()}
+                                        </span>
+                                    </td>
+                                    <td style={{ padding: '25px', textAlign: 'right', color: 'rgba(255,255,255,0.3)', fontWeight: 'bold' }}>
+                                        #{a.astronaut_id}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             </div>
-        </div>
+        </CosmoLayout>
     );
 }
+
