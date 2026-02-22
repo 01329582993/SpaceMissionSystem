@@ -1,9 +1,14 @@
 import Link from 'next/link';
+import { pool } from '@/src/lib/db';
 
 async function getMissionsList() {
-  const res = await fetch('http://localhost:3000/api/missions', { cache: 'no-store' });
-  if (!res.ok) return [];
-  return res.json();
+  try {
+    const result = await pool.query("SELECT * FROM mission_dashboard ORDER BY mission_id DESC");
+    return result.rows;
+  } catch (err) {
+    console.error("Missions Directory DB Error:", err);
+    return [];
+  }
 }
 
 export default async function MissionsCatalogPage() {
@@ -12,7 +17,8 @@ export default async function MissionsCatalogPage() {
   return (
     <>
       {/* Custom Terminal Scrollbar Styling */}
-      <style dangerouslySetInnerHTML={{ __html: `
+      <style dangerouslySetInnerHTML={{
+        __html: `
         ::-webkit-scrollbar {
           width: 8px;
         }
@@ -28,21 +34,21 @@ export default async function MissionsCatalogPage() {
         }
       `}} />
 
-      <div style={{ 
-        padding: '40px', 
-        backgroundColor: '#0b0d17', 
-        height: '100vh', 
-        color: 'white', 
+      <div style={{
+        padding: '40px',
+        backgroundColor: '#0b0d17',
+        height: '100vh',
+        color: 'white',
         fontFamily: 'sans-serif',
         boxSizing: 'border-box',
         overflowY: 'scroll', // Ensures the custom scrollbar is active
         paddingBottom: '350px' // Lifts content high enough to clear your taskbar
       }}>
-        
-        <header style={{ 
-          display: 'flex', 
-          justifyContent: 'space-between', 
-          alignItems: 'center', 
+
+        <header style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
           marginBottom: '40px',
           position: 'sticky', // Keeps header visible while scrolling
           top: 0,
@@ -58,12 +64,12 @@ export default async function MissionsCatalogPage() {
               TOTAL OPERATIONS LOGGED: {missions.length}
             </p>
           </div>
-          <Link href="/dashboard" style={{ 
-            padding: '10px 20px', 
-            border: '1px solid #4cc9f0', 
-            color: '#4cc9f0', 
-            textDecoration: 'none', 
-            borderRadius: '4px', 
+          <Link href="/dashboard" style={{
+            padding: '10px 20px',
+            border: '1px solid #4cc9f0',
+            color: '#4cc9f0',
+            textDecoration: 'none',
+            borderRadius: '4px',
             fontSize: '0.9rem',
             fontWeight: 'bold'
           }}>
@@ -78,17 +84,17 @@ export default async function MissionsCatalogPage() {
             </div>
           ) : (
             missions.map((m: any) => (
-              <Link 
-                key={m.mission_id} 
-                href={`/missions/${m.mission_id}`} 
+              <Link
+                key={m.mission_id}
+                href={`/missions/${m.mission_id}`}
                 style={{ textDecoration: 'none', color: 'inherit' }}
               >
-                <div style={{ 
-                  backgroundColor: '#161925', 
-                  padding: '25px 30px', 
-                  borderRadius: '12px', 
-                  display: 'grid', 
-                  gridTemplateColumns: '1.5fr 2.5fr 1fr 1fr 50px', 
+                <div style={{
+                  backgroundColor: '#161925',
+                  padding: '25px 30px',
+                  borderRadius: '12px',
+                  display: 'grid',
+                  gridTemplateColumns: '1.5fr 2.5fr 1fr 1fr 50px',
                   alignItems: 'center',
                   border: '1px solid #2a2d3e',
                   transition: 'all 0.3s ease',
@@ -104,15 +110,15 @@ export default async function MissionsCatalogPage() {
 
                   {/* Clean Objective Column */}
                   <div style={{ color: '#aaa', fontSize: '0.9rem', paddingRight: '20px' }}>
-                    {m.objectives ? m.objectives.substring(0, 100) + '...' : ''}
+                    {m.objective ? m.objective.substring(0, 100) + '...' : ''}
                   </div>
 
                   {/* Status Tag */}
                   <div style={{ textAlign: 'center' }}>
-                    <span style={{ 
-                      color: m.mission_status === 'active' ? '#10b981' : '#f72585', 
-                      fontSize: '0.75rem', 
-                      fontWeight: 'bold', 
+                    <span style={{
+                      color: m.mission_status === 'active' ? '#10b981' : '#f72585',
+                      fontSize: '0.75rem',
+                      fontWeight: 'bold',
                       textTransform: 'uppercase',
                       border: `1px solid ${m.mission_status === 'active' ? '#10b981' : '#f72585'}`,
                       padding: '6px 16px',

@@ -8,6 +8,7 @@ const navItems = [
   { name: "Dashboard", href: "/dashboard" },
   { name: "Missions", href: "/missions" },
   { name: "Telemetry", href: "/telemetry" },
+  { name: "Personnel", href: "/personnel" },
   { name: "Alerts", href: "/alerts" },
 ];
 
@@ -17,7 +18,7 @@ const containerVariants = {
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.1, 
+      staggerChildren: 0.1,
       delayChildren: 0.3,
     },
   },
@@ -25,10 +26,10 @@ const containerVariants = {
 
 const itemVariants = {
   hidden: { opacity: 0, x: -30 },
-  visible: { 
-    opacity: 1, 
-    x: 0, 
-    transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } 
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] }
   },
 };
 
@@ -38,26 +39,26 @@ export default function CosmoLayout() {
   return (
     <div className="flex h-screen w-full bg-black overflow-hidden font-sans">
 
-    
+
       <aside className="relative w-[480px] h-full bg-[#050b18] border-r border-white/5">
-        
-        
+
+
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,_rgba(59,130,246,0.1),transparent_70%)]" />
 
-  
-        <motion.div 
+
+        <motion.div
           className="relative z-10 flex h-full flex-col pl-24 pt-32"
           variants={containerVariants}
           initial="hidden"
           animate="visible"
         >
 
-        
+
           <motion.div variants={itemVariants} className="mb-24">
             <h1 className="text-[72px] font-bold tracking-tighter leading-none bg-clip-text text-transparent bg-gradient-to-r from-[#6ee7ff] via-[#3b82f6] to-[#9333ea]">
               CosmoTrack
             </h1>
-            
+
             <p className="mt-4 text-[20px] font-light tracking-wide text-white/70" style={{ color: "white" }}>
               Mission control & space telemetry platform
             </p>
@@ -68,18 +69,18 @@ export default function CosmoLayout() {
               const isActive = pathname === item.href;
 
               return (
-                <motion.div 
-                  key={item.name} 
+                <motion.div
+                  key={item.name}
                   variants={itemVariants}
-                  whileHover={{ x: 12 }} 
-                  whileTap={{ scale: 0.98 }} 
+                  whileHover={{ x: 12 }}
+                  whileTap={{ scale: 0.98 }}
                 >
-                  <Link 
+                  <Link
                     href={item.href}
                     className="group relative inline-block no-underline"
                   >
-                   
-                    <span 
+
+                    <span
                       className={`
                         text-[32px] 
                         font-semibold
@@ -89,15 +90,15 @@ export default function CosmoLayout() {
                         ease-out
                         block
                       `}
-                      style={{ 
+                      style={{
                         color: isActive ? "#6ee7ff" : "white",
                         textShadow: isActive ? "0 0 25px rgba(110, 231, 255, 0.5)" : "none"
-                      }} 
+                      }}
                     >
                       {item.name}
-                      
-                    
-                      <motion.span 
+
+
+                      <motion.span
                         className="absolute -bottom-2 left-0 h-[2px] bg-gradient-to-r from-[#6ee7ff] to-transparent"
                         initial={{ width: 0 }}
                         animate={{ width: isActive ? "100%" : 0 }}
@@ -113,7 +114,7 @@ export default function CosmoLayout() {
         </motion.div>
       </aside>
 
-      
+
       <div className="relative flex-1 h-full">
         <video
           autoPlay

@@ -1,9 +1,20 @@
 import Link from 'next/link';
+import { pool } from '@/src/lib/db';
 
 async function getTelemetry() {
- 
-  const res = await fetch('http://localhost:3000/api/telemetry', { cache: 'no-store' });
-  return res.ok ? res.json() : [];
+  try {
+    const result = await pool.query(`
+      SELECT t.telemetry_id, t.spacecraft_id, t.temperature, t.voltage, t.fuel_level, t.radiation, t.recorded_at, s.mission_id
+      FROM telemetry t
+      JOIN spacecraft s ON t.spacecraft_id = s.spacecraft_id
+      ORDER BY t.recorded_at DESC
+      LIMIT 100
+    `);
+    return result.rows;
+  } catch (err) {
+    console.error("Telemetry Stream DB Error:", err);
+    return [];
+  }
 }
 
 export default async function TelemetryPage() {
@@ -14,19 +25,19 @@ export default async function TelemetryPage() {
       <h1 style={{ color: '#4cc9f0', borderBottom: '2px solid #4cc9f0', paddingBottom: '10px' }}>
         LIVE TELEMETRY STREAM
       </h1>
-      
+
       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '30px' }}>
         {data.map((t: any) => (
-          <div key={t.telemetry_id} style={{ 
-            display: 'grid', 
-            gridTemplateColumns: '1fr 1fr 1fr 1fr 1.5fr', 
-            backgroundColor: '#1b1d29', 
-            padding: '20px', 
-            borderRadius: '8px', 
+          <div key={t.telemetry_id} style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr 1fr 1fr 1.5fr',
+            backgroundColor: '#1b1d29',
+            padding: '20px',
+            borderRadius: '8px',
             borderLeft: '4px solid #4cc9f0',
             alignItems: 'center'
           }}>
-            <span><strong style={{color: '#4cc9f0'}}>CRAFT ID:</strong> {t.spacecraft_id}</span>
+            <span><strong style={{ color: '#4cc9f0' }}>CRAFT ID:</strong> {t.spacecraft_id}</span>
             <span style={{ color: t.temperature > 95 ? '#ff4d4d' : '#fff' }}>
               {t.temperature > 95 ? '⚠️ ' : ''}TEMP: {t.temperature}°C
             </span>
@@ -35,9 +46,9 @@ export default async function TelemetryPage() {
               {new Date(t.recorded_at).toLocaleTimeString()}
             </span>
 
-           
+
             <div style={{ textAlign: 'right' }}>
-              <Link href={`/missions/${t.mission_id || 1}`} style={{ 
+              <Link href={`/missions/${t.mission_id || 1}`} style={{
                 backgroundColor: 'transparent',
                 color: '#4cc9f0',
                 padding: '6px 12px',
