@@ -36,57 +36,84 @@ export default function MissionTelemetryChart({ missionId }: { missionId: number
 
     return (
         <div style={{
-            backgroundColor: '#1b1d29',
-            padding: '20px',
-            borderRadius: '15px',
-            height: '350px',
-            marginTop: '20px',
-            border: '1px solid #2a2d3e'
+            backgroundColor: 'rgba(27, 29, 41, 0.7)',
+            backdropFilter: 'blur(10px)',
+            padding: '30px',
+            borderRadius: '20px',
+            height: '450px',
+            marginTop: '40px',
+            border: '1px solid rgba(255,255,255,0.05)'
         }}>
-            <h3 style={{ margin: '0 0 15px 0', color: '#4cc9f0', fontSize: '1rem', textTransform: 'uppercase' }}>
+            <h3 style={{ margin: '0 0 25px 0', color: '#4cc9f0', fontSize: '1rem', textTransform: 'uppercase', letterSpacing: '2px', fontWeight: '800' }}>
                 Live Telemetry Stream
             </h3>
-            <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={data} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#252525" vertical={false} />
+            <ResponsiveContainer width="100%" height={350}>
+                <LineChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                    <defs>
+                        <linearGradient id="colorTemp" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#4cc9f0" stopOpacity={0.3} />
+                            <stop offset="95%" stopColor="#4cc9f0" stopOpacity={0} />
+                        </linearGradient>
+                        <linearGradient id="colorRad" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#f72585" stopOpacity={0.3} />
+                            <stop offset="95%" stopColor="#f72585" stopOpacity={0} />
+                        </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
                     <XAxis
                         dataKey="time"
-                        stroke="#666"
-                        fontSize={10}
+                        stroke="rgba(255,255,255,0.3)"
+                        fontSize={11}
                         tickLine={false}
                         axisLine={false}
+                        dy={10}
                     />
                     <YAxis
-                        stroke="#666"
-                        fontSize={10}
+                        stroke="rgba(255,255,255,0.3)"
+                        fontSize={11}
                         tickLine={false}
                         axisLine={false}
+                        dx={-10}
                     />
                     <Tooltip
-                        contentStyle={{ backgroundColor: '#161925', border: '1px solid #2a2d3e', borderRadius: '8px', color: '#fff' }}
-                        itemStyle={{ fontSize: '12px' }}
+                        contentStyle={{
+                            backgroundColor: 'rgba(22, 25, 37, 0.95)',
+                            border: '1px solid rgba(76, 201, 240, 0.3)',
+                            borderRadius: '12px',
+                            color: '#fff',
+                            backdropFilter: 'blur(10px)',
+                            padding: '15px'
+                        }}
+                        itemStyle={{ fontSize: '13px', fontWeight: 'bold' }}
                     />
-                    <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
+                    <Legend
+                        verticalAlign="top"
+                        align="right"
+                        wrapperStyle={{ fontSize: '11px', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '1px', paddingBottom: '20px' }}
+                    />
                     <Line
                         type="monotone"
                         dataKey="temp"
                         name="Temp (°C)"
                         stroke="#4cc9f0"
-                        strokeWidth={2}
+                        strokeWidth={3}
                         dot={false}
-                        isAnimationActive={false}
+                        isAnimationActive={true}
+                        animationDuration={1000}
                     />
                     <Line
                         type="monotone"
                         dataKey="radiation"
                         name="Rad (mSv)"
                         stroke="#f72585"
-                        strokeWidth={2}
+                        strokeWidth={3}
                         dot={false}
-                        isAnimationActive={false}
+                        isAnimationActive={true}
+                        animationDuration={1000}
                     />
                 </LineChart>
             </ResponsiveContainer>
         </div>
     );
 }
+

@@ -1,9 +1,11 @@
 import pool from "@/src/lib/db";
 import Link from 'next/link';
 import CrewAssignmentForm from '@/src/components/CrewAssignmentForm';
+import VesselAssignmentForm from '@/src/components/VesselAssignmentForm';
 import MissionTelemetryChart from '@/src/components/MissionTelemetryChart';
 import MissionPhaseTimeline from '@/src/components/MissionPhaseTimeline';
 import LaunchButton from '@/src/components/LaunchButton';
+import CosmoLayout from '@/src/components/CosmoLayout';
 
 async function getMissionFullDetails(id: string) {
   try {
@@ -37,65 +39,75 @@ export default async function MissionDetails({ params }: { params: Promise<{ id:
 
   if (!info) {
     return (
-      <div style={{ padding: '40px', color: 'white', backgroundColor: '#0b0d17', minHeight: '100vh' }}>
-        <Link href="/dashboard" style={{ color: '#4cc9f0' }}>← Return to Dashboard</Link>
-        <p style={{ marginTop: '20px' }}>❌ Mission Not Found.</p>
-      </div>
+      <CosmoLayout>
+        <div style={{ padding: '40px', color: 'white' }}>
+          <Link href="/dashboard" style={{ color: '#4cc9f0' }}>← Return to Dashboard</Link>
+          <p style={{ marginTop: '20px' }}>❌ Mission Not Found.</p>
+        </div>
+      </CosmoLayout>
     );
   }
 
   return (
-    <div style={{ padding: '40px', color: 'white', backgroundColor: '#0b0d17', minHeight: '100vh', fontFamily: 'sans-serif' }}>
-      <Link href="/dashboard" style={{ color: '#4cc9f0', textDecoration: 'none' }}>← BACK TO COMMAND</Link>
+    <CosmoLayout>
+      <div style={{ padding: '60px', color: 'white', fontFamily: 'sans-serif' }}>
 
-      <header style={{ marginTop: '30px', borderBottom: '1px solid #333', paddingBottom: '20px' }}>
-        <h1 style={{ fontSize: '3rem', margin: '0' }}>{info.name}</h1>
-        <p style={{ color: '#4cc9f0', margin: '5px 0' }}>COMMANDER: {info.commander || "Not assigned"}</p>
-      </header>
+        <header style={{ borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '20px' }}>
+          <h1 style={{ fontSize: '3.5rem', margin: '0', fontWeight: '800', letterSpacing: '-1px' }}>{info.name}</h1>
+          <p style={{ color: '#4cc9f0', margin: '10px 0', fontSize: '1.1rem', fontWeight: '500' }}>COMMANDER: {info.commander || "Not assigned"}</p>
+        </header>
 
-      <div style={{ marginTop: '30px', display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '30px' }}>
+        <div style={{ marginTop: '40px', display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '40px' }}>
 
-        <div>
-          <MissionPhaseTimeline missionId={mId} />
-          <section style={{ backgroundColor: '#1b1d29', padding: '25px', borderRadius: '15px', marginBottom: '30px' }}>
-            <h2 style={{ color: '#4cc9f0', marginTop: '0' }}>Primary Objective</h2>
-            <p style={{ lineHeight: '1.6', fontSize: '1.1rem' }}>{info.objective || "No objective data available."}</p>
-          </section>
+          <div>
+            <MissionPhaseTimeline missionId={mId} />
+            <section style={{ backgroundColor: 'rgba(27, 29, 41, 0.7)', backdropFilter: 'blur(10px)', padding: '30px', borderRadius: '20px', marginBottom: '30px', border: '1px solid rgba(255,255,255,0.05)' }}>
+              <h2 style={{ color: '#4cc9f0', marginTop: '0', fontSize: '1.2rem', textTransform: 'uppercase', letterSpacing: '2px' }}>Primary Objective</h2>
+              <p style={{ lineHeight: '1.8', fontSize: '1.1rem', color: 'rgba(255,255,255,0.8)' }}>{info.objective || "No objective data available."}</p>
+            </section>
 
-          <h2 style={{ color: '#fff' }}>Deployed Spacecraft</h2>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-            {ships.map((ship: any) => (
-              <div key={ship.spacecraft_id} style={{ backgroundColor: '#1b1d29', padding: '20px', borderRadius: '10px', borderLeft: '4px solid #4cc9f0' }}>
-                <h3 style={{ margin: '0' }}>{ship.name}</h3>
-                <p style={{ margin: '10px 0', color: '#ccc' }}>Status: {ship.health_status}</p>
-                <progress value={ship.fuel_level} max="100" style={{ width: '100%' }}></progress>
-                <small>Fuel: {ship.fuel_level}%</small>
-              </div>
-            ))}
+            <h2 style={{ color: '#fff', fontSize: '1.5rem', marginBottom: '20px' }}>Deployed Spacecraft</h2>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+              {ships.map((ship: any) => (
+                <div key={ship.spacecraft_id} style={{ backgroundColor: 'rgba(27, 29, 41, 0.7)', backdropFilter: 'blur(10px)', padding: '25px', borderRadius: '15px', border: '1px solid rgba(255,255,255,0.05)', borderLeft: '4px solid #4cc9f0' }}>
+                  <h3 style={{ margin: '0', fontSize: '1.2rem' }}>{ship.name}</h3>
+                  <p style={{ margin: '10px 0', color: 'rgba(255,255,255,0.5)', fontSize: '0.9rem' }}>Status: {ship.health_status}</p>
+                  <div style={{ backgroundColor: 'rgba(255,255,255,0.1)', height: '6px', borderRadius: '3px', overflow: 'hidden', margin: '15px 0 5px 0' }}>
+                    <div style={{ backgroundColor: '#4cc9f0', height: '100%', width: `${ship.fuel_level}%` }} />
+                  </div>
+                  <small style={{ color: '#4cc9f0', fontWeight: 'bold' }}>Fuel: {ship.fuel_level}%</small>
+                </div>
+              ))}
+            </div>
+
+            <div style={{ marginTop: '40px' }}>
+              <MissionTelemetryChart missionId={mId} />
+            </div>
           </div>
 
-          <MissionTelemetryChart missionId={mId} />
+
+          <aside style={{ backgroundColor: 'rgba(27, 29, 41, 0.7)', backdropFilter: 'blur(10px)', padding: '30px', borderRadius: '20px', height: 'fit-content', border: '1px solid rgba(255,255,255,0.05)' }}>
+            <h2 style={{ color: '#4cc9f0', marginTop: '0', fontSize: '1.2rem', textTransform: 'uppercase', letterSpacing: '2px' }}>Mission Crew</h2>
+            <div style={{ marginTop: '20px', marginBottom: '30px' }}>
+              {crew.length > 0 ? (
+                crew.map((member: any, idx: number) => (
+                  <div key={idx} style={{ padding: '15px 0', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                    <p style={{ margin: '0', fontWeight: 'bold', fontSize: '1.1rem' }}>{member.name}</p>
+                    <p style={{ margin: '5px 0 0 0', fontSize: '0.85rem', color: '#4cc9f0', opacity: 0.8 }}>{member.rank} - {member.position}</p>
+                  </div>
+                ))
+              ) : (
+                <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.9rem' }}>No crew assigned to this mission.</p>
+              )}
+            </div>
+
+            <LaunchButton missionId={mId} status={info.status} />
+            <CrewAssignmentForm missionId={mId} />
+            <VesselAssignmentForm missionId={mId} />
+          </aside>
+
         </div>
-
-
-        <aside style={{ backgroundColor: '#1b1d29', padding: '25px', borderRadius: '15px', height: 'fit-content' }}>
-          <h2 style={{ color: '#4cc9f0', marginTop: '0' }}>Mission Crew</h2>
-          {crew.length > 0 ? (
-            crew.map((member: any, idx: number) => (
-              <div key={idx} style={{ padding: '10px 0', borderBottom: '1px solid #333' }}>
-                <p style={{ margin: '0', fontWeight: 'bold' }}>{member.name}</p>
-                <p style={{ margin: '0', fontSize: '0.8rem', color: '#aaa' }}>{member.rank} - {member.position}</p>
-              </div>
-            ))
-          ) : (
-            <p style={{ color: '#888' }}>No crew assigned to this mission.</p>
-          )}
-
-          <LaunchButton missionId={mId} status={info.status} />
-          <CrewAssignmentForm missionId={mId} />
-        </aside>
-
       </div>
-    </div>
+    </CosmoLayout>
   );
 }
