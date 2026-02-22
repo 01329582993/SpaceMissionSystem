@@ -1,24 +1,23 @@
 import pool from "@/src/lib/db";
 import Link from 'next/link';
+import CrewAssignmentForm from '@/src/components/CrewAssignmentForm';
 
 async function getMissionFullDetails(id: string) {
   try {
     const mId = parseInt(id);
 
-    const mission = await pool.query("SELECT * FROM Mission WHERE mission_id = $1", [mId]);
-    
+    const mission = await pool.query("SELECT * FROM mission WHERE mission_id = $1", [mId]);
 
-    const spacecrafts = await pool.query("SELECT * FROM Spacecraft WHERE mission_id = $1", [mId]);
-    
-  
+    const spacecrafts = await pool.query("SELECT * FROM spacecraft WHERE mission_id = $1", [mId]);
+
     const crew = await pool.query(`
       SELECT a.name, mc.position, a.rank 
       FROM astronaut a 
       JOIN mission_crew mc ON a.astronaut_id = mc.astronaut_id 
       WHERE mc.mission_id = $1`, [mId]);
 
-    return { 
-      info: mission.rows[0] || null, 
+    return {
+      info: mission.rows[0] || null,
       ships: spacecrafts.rows || [],
       crew: crew.rows || []
     };
@@ -31,6 +30,7 @@ async function getMissionFullDetails(id: string) {
 export default async function MissionDetails({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = await params;
   const { info, ships, crew } = await getMissionFullDetails(resolvedParams.id);
+  const mId = parseInt(resolvedParams.id);
 
   if (!info) {
     return (
@@ -44,14 +44,14 @@ export default async function MissionDetails({ params }: { params: Promise<{ id:
   return (
     <div style={{ padding: '40px', color: 'white', backgroundColor: '#0b0d17', minHeight: '100vh', fontFamily: 'sans-serif' }}>
       <Link href="/dashboard" style={{ color: '#4cc9f0', textDecoration: 'none' }}>← BACK TO COMMAND</Link>
-      
+
       <header style={{ marginTop: '30px', borderBottom: '1px solid #333', paddingBottom: '20px' }}>
         <h1 style={{ fontSize: '3rem', margin: '0' }}>{info.name}</h1>
         <p style={{ color: '#4cc9f0', margin: '5px 0' }}>COMMANDER: {info.commander || "Not assigned"}</p>
       </header>
 
       <div style={{ marginTop: '30px', display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '30px' }}>
- 
+
         <div>
           <section style={{ backgroundColor: '#1b1d29', padding: '25px', borderRadius: '15px', marginBottom: '30px' }}>
             <h2 style={{ color: '#4cc9f0', marginTop: '0' }}>Primary Objective</h2>
@@ -84,6 +84,8 @@ export default async function MissionDetails({ params }: { params: Promise<{ id:
           ) : (
             <p style={{ color: '#888' }}>No crew assigned to this mission.</p>
           )}
+
+          <CrewAssignmentForm missionId={mId} />
         </aside>
 
       </div>

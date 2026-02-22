@@ -32,16 +32,30 @@ export default async function PersonnelPage() {
                     <h1 style={{ margin: 0, fontSize: '2.5rem', fontWeight: '800' }}>PERSONNEL ROSTER</h1>
                     <p style={{ color: '#4cc9f0', margin: '5px 0 0 0' }}>ACTIVE DUTY OFFICERS: {staff.length}</p>
                 </div>
-                <Link href="/dashboard" style={{
-                    padding: '10px 20px',
-                    border: '1px solid #4cc9f0',
-                    color: '#4cc9f0',
-                    textDecoration: 'none',
-                    borderRadius: '4px',
-                    fontWeight: 'bold'
-                }}>
-                    RETURN TO COMMAND
-                </Link>
+                <div style={{ display: 'flex', gap: '15px' }}>
+                    <Link href="/personnel/new" style={{
+                        padding: '10px 20px',
+                        backgroundColor: '#4cc9f0',
+                        color: '#0b0d17',
+                        textDecoration: 'none',
+                        borderRadius: '4px',
+                        fontWeight: 'bold',
+                        fontSize: '0.9rem',
+                        textTransform: 'uppercase'
+                    }}>
+                        + Register Officer
+                    </Link>
+                    <Link href="/dashboard" style={{
+                        padding: '10px 20px',
+                        border: '1px solid #4cc9f0',
+                        color: '#4cc9f0',
+                        textDecoration: 'none',
+                        borderRadius: '4px',
+                        fontWeight: 'bold'
+                    }}>
+                        RETURN TO COMMAND
+                    </Link>
+                </div>
             </header>
 
             <div style={{ backgroundColor: '#161925', borderRadius: '12px', border: '1px solid #2a2d3e', overflow: 'hidden' }}>
