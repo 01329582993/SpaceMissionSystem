@@ -16,9 +16,24 @@ export default async function DashboardPage() {
 
   return (
     <div style={{ padding: '40px', backgroundColor: '#0b0d17', minHeight: '100vh', color: 'white', fontFamily: 'sans-serif' }}>
-      <h1 style={{ color: '#4cc9f0', borderBottom: '2px solid #4cc9f0', paddingBottom: '10px', letterSpacing: '2px' }}>
-        COSMOTRACK COMMAND CENTER
-      </h1>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid #4cc9f0', paddingBottom: '10px' }}>
+        <h1 style={{ color: '#4cc9f0', margin: 0, letterSpacing: '2px' }}>
+          COSMOTRACK COMMAND CENTER
+        </h1>
+        <Link href="/missions/new" style={{
+          backgroundColor: '#4cc9f0',
+          color: '#0b0d17',
+          padding: '10px 20px',
+          borderRadius: '6px',
+          textDecoration: 'none',
+          fontWeight: 'bold',
+          fontSize: '0.9rem',
+          textTransform: 'uppercase',
+          letterSpacing: '1px'
+        }}>
+          + New Mission
+        </Link>
+      </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '25px', marginTop: '30px' }}>
         {missions.map((m: any) => (

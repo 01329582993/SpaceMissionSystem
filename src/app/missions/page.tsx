@@ -64,17 +64,31 @@ export default async function MissionsCatalogPage() {
               TOTAL OPERATIONS LOGGED: {missions.length}
             </p>
           </div>
-          <Link href="/dashboard" style={{
-            padding: '10px 20px',
-            border: '1px solid #4cc9f0',
-            color: '#4cc9f0',
-            textDecoration: 'none',
-            borderRadius: '4px',
-            fontSize: '0.9rem',
-            fontWeight: 'bold'
-          }}>
-            RETURN TO COMMAND
-          </Link>
+          <div style={{ display: 'flex', gap: '15px' }}>
+            <Link href="/missions/new" style={{
+              padding: '10px 20px',
+              backgroundColor: '#4cc9f0',
+              color: '#0b0d17',
+              textDecoration: 'none',
+              borderRadius: '4px',
+              fontSize: '0.9rem',
+              fontWeight: 'bold',
+              textTransform: 'uppercase'
+            }}>
+              + Initialize Mission
+            </Link>
+            <Link href="/dashboard" style={{
+              padding: '10px 20px',
+              border: '1px solid #4cc9f0',
+              color: '#4cc9f0',
+              textDecoration: 'none',
+              borderRadius: '4px',
+              fontSize: '0.9rem',
+              fontWeight: 'bold'
+            }}>
+              RETURN TO COMMAND
+            </Link>
+          </div>
         </header>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
