@@ -62,14 +62,18 @@ END;
 $$;
 
 -- 4. Mission Dashboard View
-DROP VIEW IF EXISTS mission_dashboard;
+DROP VIEW IF EXISTS mission_dashboard CASCADE;
 CREATE OR REPLACE VIEW mission_dashboard AS
 SELECT
     m.mission_id,
     m.name AS mission_name,
     m.status AS mission_status,
     m.objective,
+    m.start_date,
+    m.end_date,
     (SELECT COUNT(*) FROM spacecraft s WHERE s.mission_id = m.mission_id) AS spacecraft_count,
-    (SELECT COUNT(*) FROM alert a WHERE a.mission_id = m.mission_id AND a.is_resolved = FALSE) AS alert_count
+    (SELECT COUNT(*) FROM mission_crew mc WHERE mc.mission_id = m.mission_id) AS astronaut_count,
+    (SELECT COUNT(*) FROM alert a WHERE a.mission_id = m.mission_id AND a.is_resolved = FALSE) AS alert_count,
+    (SELECT COUNT(*) FROM experiment e WHERE e.mission_id = m.mission_id) AS experiment_count
 FROM mission m;
 
