@@ -2,17 +2,20 @@ import Link from 'next/link';
 import { pool } from '@/src/lib/db';
 import CosmoLayout from '@/src/components/CosmoLayout';
 
+/**
+ * Server Component to fetch the latest 150 audit entries.
+ */
 async function getLogs() {
     try {
         const result = await pool.query(`
-      SELECT log_id, action, table_name, record_id, changed_at, details 
-      FROM audit_log 
-      ORDER BY changed_at DESC 
-      LIMIT 100
-    `);
+            SELECT log_id, action, table_name, record_id, changed_at, details 
+            FROM audit_log 
+            ORDER BY changed_at DESC 
+            LIMIT 150
+        `);
         return result.rows;
     } catch (err) {
-        console.error("Logs Fetch Error:", err);
+        console.error("CRITICAL_DATABASE_UPLINK_FAILURE:", err);
         return [];
     }
 }
@@ -22,63 +25,206 @@ export default async function AuditLogsPage() {
 
     return (
         <CosmoLayout>
-            <div style={{ padding: '60px', color: 'white', fontFamily: 'sans-serif' }}>
-                <header style={{ marginBottom: '40px', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '20px' }}>
-                    <h1 style={{ color: '#4cc9f0', fontSize: '2.5rem', fontWeight: '800', margin: 0, letterSpacing: '-1px' }}>SYSTEM AUDIT LOGS</h1>
-                    <p style={{ color: 'rgba(255,255,255,0.5)', margin: '5px 0 0 0', textTransform: 'uppercase', letterSpacing: '2px', fontSize: '0.8rem' }}>REAL-TIME RELATIONAL DATA TRACEABILITY</p>
+            <div style={containerStyle}>
+                {/* --- HEADER SECTION --- */}
+                <header style={headerStyle}>
+                    <div>
+                        <h1 style={titleStyle}>SYSTEM_AUDIT_LOGS</h1>
+                        <p style={subtitleStyle}>REAL-TIME RELATIONAL DATA TRACEABILITY // SECTOR_7</p>
+                    </div>
+                    <div style={navGroup}>
+                        <Link href="/alerts" style={navLink}>BACK_TO_MATRIX</Link>
+                        <div style={countBadge}>{logs.length} ENTRIES_RECOVERED</div>
+                    </div>
                 </header>
 
-                <div style={{
-                    backgroundColor: 'rgba(22, 25, 37, 0.7)',
-                    backdropFilter: 'blur(10px)',
-                    borderRadius: '15px',
-                    border: '1px solid rgba(255,255,255,0.05)',
-                    overflow: 'hidden'
-                }}>
-                    <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                        <thead>
-                            <tr style={{ backgroundColor: 'rgba(76, 201, 240, 0.1)', color: '#4cc9f0', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '1px' }}>
-                                <th style={{ padding: '20px' }}>Log ID</th>
-                                <th style={{ padding: '20px' }}>Action</th>
-                                <th style={{ padding: '20px' }}>Target Table</th>
-                                <th style={{ padding: '20px' }}>Reference</th>
-                                <th style={{ padding: '20px' }}>Timestamp</th>
-                                <th style={{ padding: '20px' }}>Command Details</th>
+                {/* --- LOG TABLE TERMINAL --- */}
+                <div style={logTerminal}>
+                    <table style={tableStyle}>
+                        <thead style={theadStyle}>
+                            <tr>
+                                <th style={thStyle}>TRACE_ID</th>
+                                <th style={thStyle}>OP_TYPE</th>
+                                <th style={thStyle}>TARGET_TABLE</th>
+                                <th style={thStyle}>RECORD_REF</th>
+                                <th style={thStyle}>TIMESTAMP (UTC)</th>
+                                <th style={thStyle}>EXECUTION_DETAILS</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {logs.length > 0 ? logs.map((log: any) => (
-                                <tr key={log.log_id} style={{ borderBottom: '1px solid rgba(255,255,255,0.03)', fontSize: '0.9rem' }}>
-                                    <td style={{ padding: '20px', color: 'rgba(255,255,255,0.3)' }}>#{log.log_id}</td>
-                                    <td style={{ padding: '20px' }}>
-                                        <span style={{
-                                            color: log.action === 'INSERT' ? '#10b981' : (log.action === 'UPDATE' ? '#4cc9f0' : (log.action === 'PROCEDURE' ? '#7209b7' : '#f72585')),
-                                            fontWeight: '800',
-                                            fontSize: '0.7rem',
-                                            letterSpacing: '1px',
-                                            backgroundColor: log.action === 'INSERT' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(76, 201, 240, 0.1)',
-                                            padding: '4px 10px',
-                                            borderRadius: '4px'
-                                        }}>
-                                            {log.action}
-                                        </span>
-                                    </td>
-                                    <td style={{ padding: '20px', fontWeight: 'bold', color: 'rgba(255,255,255,0.8)' }}>{log.table_name.toUpperCase()}</td>
-                                    <td style={{ padding: '20px', color: '#4cc9f0' }}>ID: {log.record_id}</td>
-                                    <td style={{ padding: '20px', color: 'rgba(255,255,255,0.5)', fontSize: '0.8rem' }}>
-                                        {new Date(log.changed_at).toLocaleString()}
-                                    </td>
-                                    <td style={{ padding: '20px', color: 'rgba(255,255,255,0.6)', fontStyle: 'italic' }}>{log.details}</td>
-                                </tr>
-                            )) : (
+                            {logs.length > 0 ? (
+                                logs.map((log: any) => (
+                                    <tr key={log.log_id} style={trStyle}>
+                                        <td style={idCol}>
+                                            [{log.log_id.toString().padStart(4, '0')}]
+                                        </td>
+                                        
+                                        <td style={paddingStyle}>
+                                            <Link 
+                                                href={`/logs/trace/${log.log_id}`} 
+                                                style={{ textDecoration: 'none' }}
+                                            >
+                                                <span style={actionBadgeStyle(log.action)}>
+                                                    {log.action}
+                                                </span>
+                                            </Link>
+                                        </td>
+
+                                        <td style={whiteTextBold}>
+                                            {log.table_name.toUpperCase()}
+                                        </td>
+
+                                        <td style={cyanText}>
+                                            REF_ID: {log.record_id}
+                                        </td>
+
+                                        <td style={whiteText}>
+                                            {/* Static UTC slice prevents hydration mismatches from local time conversion */}
+                                            {new Date(log.changed_at).toISOString().replace('T', ' ').slice(0, 19)}
+                                        </td>
+
+                                        <td style={detailText}>
+                                            {log.details || "NO_ADDITIONAL_METADATA"}
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
                                 <tr>
-                                    <td colSpan={6} style={{ padding: '60px', textAlign: 'center', color: 'rgba(255,255,255,0.2)', fontSize: '1.2rem' }}>NO SYSTEM LOGS RECORDED</td>
+                                    <td colSpan={6} style={emptyStateStyle}>
+                                        NO_SYSTEM_LOGS_DETECTED_IN_SECTOR_7
+                                    </td>
                                 </tr>
                             )}
                         </tbody>
                     </table>
                 </div>
             </div>
+
+            {/* --- TACTICAL CSS --- */}
+            <style dangerouslySetInnerHTML={{ __html: `
+                @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+                
+                tbody tr:hover {
+                    background-color: rgba(0, 255, 213, 0.05) !important;
+                }
+                
+                /* Custom Scrollbar */
+                div::-webkit-scrollbar { width: 8px; }
+                div::-webkit-scrollbar-track { background: #000; }
+                div::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+                div::-webkit-scrollbar-thumb:hover { background: #00ffd5; }
+            `}} />
         </CosmoLayout>
     );
 }
+
+/* --- STYLE DEFINITIONS --- */
+
+const containerStyle: React.CSSProperties = {
+    padding: '40px 60px',
+    backgroundColor: '#000',
+    minHeight: '100vh',
+    fontFamily: "'JetBrains Mono', monospace",
+};
+
+const headerStyle: React.CSSProperties = {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+    marginBottom: '30px',
+    borderBottom: '2px solid #222',
+    paddingBottom: '20px'
+};
+
+const titleStyle = {
+    fontSize: '2.2rem',
+    fontWeight: '800',
+    color: '#fff',
+    margin: 0,
+    letterSpacing: '1px'
+};
+
+const subtitleStyle = {
+    color: '#00ffd5',
+    fontSize: '0.85rem',
+    margin: '5px 0 0 0',
+    letterSpacing: '2px',
+    textTransform: 'uppercase' as const
+};
+
+const navGroup = { display: 'flex', alignItems: 'center', gap: '20px' };
+
+const navLink = {
+    color: '#fff',
+    textDecoration: 'none',
+    fontSize: '0.8rem',
+    border: '1px solid #444',
+    padding: '8px 16px',
+    fontWeight: 'bold'
+};
+
+const countBadge = {
+    backgroundColor: '#00ffd5',
+    color: '#000',
+    padding: '8px 16px',
+    fontSize: '0.8rem',
+    fontWeight: '800'
+};
+
+const logTerminal = {
+    backgroundColor: '#050505',
+    border: '1px solid #222',
+    maxHeight: '75vh',
+    overflowY: 'auto' as const,
+    boxShadow: '0 20px 50px rgba(0,0,0,0.5)'
+};
+
+const tableStyle = {
+    width: '100%',
+    borderCollapse: 'collapse' as const,
+};
+
+const theadStyle = {
+    position: 'sticky' as const,
+    top: 0,
+    backgroundColor: '#0a0a0a',
+    zIndex: 10,
+    borderBottom: '2px solid #333'
+};
+
+const thStyle = {
+    padding: '20px',
+    textAlign: 'left' as const,
+    color: '#00ffd5',
+    fontSize: '0.85rem',
+    fontWeight: 'bold',
+    textTransform: 'uppercase' as const
+};
+
+const trStyle = { borderBottom: '1px solid #111' };
+const paddingStyle = { padding: '15px 20px' };
+
+const whiteText = { ...paddingStyle, color: '#FFFFFF', fontSize: '0.95rem' };
+const whiteTextBold = { ...whiteText, fontWeight: 'bold' };
+const cyanText = { ...paddingStyle, color: '#00ffd5', fontSize: '0.95rem', fontWeight: 'bold' };
+const idCol = { ...paddingStyle, color: '#444', fontSize: '0.9rem' };
+const detailText = { ...paddingStyle, color: '#EEE', fontSize: '0.95rem', fontStyle: 'italic' };
+
+const emptyStateStyle = {
+    padding: '100px',
+    textAlign: 'center' as const,
+    color: '#333',
+    letterSpacing: '5px',
+    fontSize: '1.2rem'
+};
+
+const actionBadgeStyle = (action: string) => ({
+    padding: '5px 12px',
+    borderRadius: '2px',
+    fontSize: '0.75rem',
+    fontWeight: '900',
+    backgroundColor: action === 'INSERT' ? '#00ff66' : action === 'UPDATE' ? '#0099ff' : '#ff0055',
+    color: '#000',
+    display: 'inline-block',
+    textTransform: 'uppercase' as const
+});

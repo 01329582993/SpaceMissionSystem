@@ -56,3 +56,55 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- =========================================
+-- ADD FUEL RATE + ENGINE LOAD
+-- =========================================
+
+ALTER TABLE spacecraft
+ADD COLUMN engine_efficiency INT DEFAULT 100;  -- 0–100
+
+ALTER TABLE mission
+ADD COLUMN distance_remaining INT DEFAULT 100000; -- km
+
+-- =========================================
+-- FUEL CALCULATION FUNCTION
+-- =========================================
+
+CREATE OR REPLACE FUNCTION calculate_fuel_burn(
+    s_id INT,
+    hours INT
+)
+RETURNS INT AS $$
+DECLARE
+    base_rate INT;
+    efficiency INT;
+    temp_factor INT;
+    burn INT;
+BEGIN
+    -- Base burn rate
+    base_rate := 5;  -- 5 units per hour base
+
+    -- Get engine efficiency
+    SELECT engine_efficiency INTO efficiency
+    FROM spacecraft
+    WHERE spacecraft_id = s_id;
+
+    -- Get latest temperature
+    SELECT temperature INTO temp_factor
+    FROM telemetry
+    WHERE spacecraft_id = s_id
+    ORDER BY recorded_at DESC
+    LIMIT 1;
+
+    -- Temperature increases burn
+    IF temp_factor > 80 THEN
+        base_rate := base_rate + 3;
+    END IF;
+
+    -- Efficiency reduces burn
+    burn := (base_rate * hours) - (efficiency / 20);
+
+    RETURN GREATEST(burn, 1);
+END;
+$$ LANGUAGE plpgsql;
+

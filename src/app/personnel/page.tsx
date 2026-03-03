@@ -5,11 +5,11 @@ import CosmoLayout from '@/src/components/CosmoLayout';
 async function getPersonnel() {
     try {
         const result = await pool.query(`
-      SELECT astronaut_id, name, role, availability
-      FROM astronaut
-      ORDER BY name
-    `);
-        return result.rows;
+            SELECT astronaut_id, name, role, availability
+            FROM astronaut
+            ORDER BY name
+        `);
+        return result.rows || [];
     } catch (err) {
         console.error("Personnel Roster DB Error:", err);
         return [];
@@ -21,70 +21,46 @@ export default async function PersonnelPage() {
 
     return (
         <CosmoLayout>
-            <div style={{ padding: '60px', color: 'white', fontFamily: 'sans-serif' }}>
-                <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '20px' }}>
+            <div style={containerStyle}>
+                <header style={headerStyle}>
                     <div>
-                        <h1 style={{ margin: 0, fontSize: '2.5rem', fontWeight: '800', color: '#4cc9f0', letterSpacing: '-1px' }}>PERSONNEL ROSTER</h1>
-                        <p style={{ color: 'rgba(255,255,255,0.5)', margin: '5px 0 0 0', textTransform: 'uppercase', letterSpacing: '2px', fontSize: '0.8rem' }}>ACTIVE DUTY OFFICERS: {staff.length}</p>
+                        <h1 style={titleStyle}>PERSONNEL_ROSTER</h1>
+                        <p style={statsStyle}>ACTIVE_DUTY_OFFICERS // {staff.length} UNITS</p>
                     </div>
 
-                    <Link href="/personnel/new" style={{
-                        padding: '14px 28px',
-                        backgroundColor: '#4cc9f0',
-                        color: '#0b0d17',
-                        textDecoration: 'none',
-                        borderRadius: '10px',
-                        fontWeight: 'bold',
-                        fontSize: '0.9rem',
-                        textTransform: 'uppercase',
-                        letterSpacing: '1px',
-                        boxShadow: '0 0 20px rgba(76, 201, 240, 0.3)'
-                    }}>
-                        + Register Officer
+                    <Link href="/personnel/new" className="tactical-link" style={registerBtnStyle}>
+                        ENLIST_OFFICER +
                     </Link>
                 </header>
 
-                <div style={{
-                    backgroundColor: 'rgba(22, 25, 37, 0.7)',
-                    backdropFilter: 'blur(10px)',
-                    borderRadius: '20px',
-                    border: '1px solid rgba(255,255,255,0.05)',
-                    overflow: 'hidden'
-                }}>
-                    <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                <div style={tableWrapper}>
+                    <table style={tableStyle}>
                         <thead>
-                            <tr style={{ backgroundColor: 'rgba(76, 201, 240, 0.1)', color: '#4cc9f0', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '1px' }}>
-                                <th style={{ padding: '25px' }}>OFFICER NAME</th>
-                                <th style={{ padding: '25px' }}>DESIGNATION</th>
-                                <th style={{ padding: '25px' }}>OPERATIONAL STATUS</th>
-                                <th style={{ padding: '25px', textAlign: 'right' }}>ASSET ID</th>
+                            <tr style={theadRowStyle}>
+                                <th style={thStyle}>OFFICER_IDENTIFICATION</th>
+                                <th style={thStyle}>DESIGNATION</th>
+                                <th style={thStyle}>OPERATIONAL_STATUS</th>
+                                <th style={{ ...thStyle, textAlign: 'right' }}>ASSET_ID</th>
                             </tr>
                         </thead>
                         <tbody>
                             {staff.map((a: any) => (
-                                <tr key={a.astronaut_id} style={{ borderBottom: '1px solid rgba(255,255,255,0.03)', transition: 'background 0.3s ease' }}>
-                                    <td style={{ padding: '25px', fontWeight: '700', fontSize: '1.1rem' }}>{a.name.toUpperCase()}</td>
-                                    <td style={{ padding: '25px', color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', fontSize: '0.85rem' }}>{a.role}</td>
-                                    <td style={{ padding: '25px' }}>
-                                        <span style={{
-                                            color: a.availability === 'Available' ? '#10b981' : '#f72585',
-                                            fontSize: '0.85rem',
-                                            fontWeight: '800',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: '10px',
-                                            letterSpacing: '1px'
-                                        }}>
-                                            <span style={{
-                                                width: '10px', height: '10px', borderRadius: '50%',
-                                                backgroundColor: a.availability === 'Available' ? '#10b981' : '#f72585',
-                                                boxShadow: `0 0 10px ${a.availability === 'Available' ? '#10b981' : '#f72585'}`
-                                            }}></span>
-                                            {a.availability.toUpperCase()}
-                                        </span>
+                                <tr key={a.astronaut_id} className="roster-row" style={trStyle}>
+                                    <td style={nameTdStyle}>
+                                        {/* Added safety check for toUpperCase */}
+                                        {a.name ? a.name.toUpperCase() : "UNKNOWN_OFFICER"}
                                     </td>
-                                    <td style={{ padding: '25px', textAlign: 'right', color: 'rgba(255,255,255,0.3)', fontWeight: 'bold' }}>
-                                        #{a.astronaut_id}
+                                    <td style={roleTdStyle}>{a.role || 'UNASSIGNED'}</td>
+                                    <td style={tdStyle}>
+                                        <div style={statusWrapper}>
+                                            <span style={statusDot(a.availability)}></span>
+                                            <span style={statusText(a.availability)}>
+                                                {a.availability ? a.availability.toUpperCase() : 'OFFLINE'}
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <td style={idTdStyle}>
+                                        USR_{a.astronaut_id.toString().padStart(4, '0')}
                                     </td>
                                 </tr>
                             ))}
@@ -92,7 +68,31 @@ export default async function PersonnelPage() {
                     </table>
                 </div>
             </div>
+
+            <style dangerouslySetInnerHTML={{ __html: `
+                @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Orbitron:wght@900&display=swap');
+                .tactical-link:hover { background: #00ffd5 !important; color: #000 !important; box-shadow: 0 0 20px #00ffd5; }
+                .roster-row:hover { background: rgba(255, 255, 255, 0.03) !important; border-left: 4px solid #00ffd5 !important; }
+            `}} />
         </CosmoLayout>
     );
 }
 
+/* --- THEME STYLES --- */
+const containerStyle: React.CSSProperties = { padding: '60px', backgroundColor: '#000', minHeight: '100vh', color: '#fff', fontFamily: "'JetBrains Mono', monospace" };
+const headerStyle: React.CSSProperties = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '50px', borderBottom: '1px solid #222', paddingBottom: '30px' };
+const titleStyle = { margin: 0, fontSize: '1.8rem', fontWeight: 900, fontFamily: "'Orbitron', sans-serif", letterSpacing: '2px' };
+const statsStyle = { color: '#00ffd5', margin: '8px 0 0 0', fontSize: '0.7rem', fontWeight: 700, letterSpacing: '1px' };
+const registerBtnStyle = { padding: '12px 24px', backgroundColor: '#fff', color: '#000', textDecoration: 'none', fontWeight: 'bold', fontSize: '0.8rem', letterSpacing: '1px', transition: '0.3s' };
+const tableWrapper = { background: '#080808', border: '1px solid #1a1a1a', borderRadius: '4px', overflow: 'hidden' };
+const tableStyle: React.CSSProperties = { width: '100%', borderCollapse: 'collapse', textAlign: 'left' };
+const theadRowStyle = { background: '#111', color: '#555' };
+const thStyle: React.CSSProperties = { padding: '20px 25px', fontSize: '0.65rem', fontWeight: 800, letterSpacing: '2px' };
+const trStyle: React.CSSProperties = { borderBottom: '1px solid #111', transition: '0.2s' };
+const tdStyle: React.CSSProperties = { padding: '25px' };
+const nameTdStyle: React.CSSProperties = { ...tdStyle, fontWeight: 700, fontSize: '1rem', letterSpacing: '0.5px' };
+const roleTdStyle: React.CSSProperties = { ...tdStyle, color: '#aaa', fontSize: '0.8rem' };
+const idTdStyle: React.CSSProperties = { ...tdStyle, textAlign: 'right', color: '#444', fontSize: '0.75rem', fontWeight: 'bold' };
+const statusWrapper = { display: 'flex', alignItems: 'center', gap: '10px' };
+const statusDot = (avail: string) => ({ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: avail === 'Available' ? '#00ffd5' : '#ff0055', boxShadow: `0 0 10px ${avail === 'Available' ? '#00ffd5' : '#ff0055'}` });
+const statusText = (avail: string) => ({ fontSize: '0.75rem', fontWeight: 800, color: avail === 'Available' ? '#00ffd5' : '#ff0055' });

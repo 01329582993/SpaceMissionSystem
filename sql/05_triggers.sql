@@ -71,3 +71,6 @@ CREATE TRIGGER trg_no_overlap
 BEFORE INSERT OR UPDATE ON communication_window
 FOR EACH ROW EXECUTE FUNCTION prevent_overlap();
 
+CREATE TRIGGER trg_audit_alerts
+AFTER INSERT OR UPDATE OR DELETE ON alerts
+FOR EACH ROW EXECUTE FUNCTION log_changes();
