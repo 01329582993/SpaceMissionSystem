@@ -26,13 +26,4 @@ Automated workflows using triggers and procedures.
 # SpaceMissionSystem / CosmoTrack
 
 
-### 3) Verification queries
-Run these to confirm everything is correct:
 
-```sql
-SELECT COUNT(*) FROM Mission;        -- expect 3
-SELECT COUNT(*) FROM Spacecraft;     -- expect 3
-SELECT COUNT(*) FROM Telemetry;      -- expect ~100
-SELECT * FROM Alert ORDER BY created_at DESC;
-SELECT * FROM Communication_Window;
->>>>>>> origin/zinnia-progress
