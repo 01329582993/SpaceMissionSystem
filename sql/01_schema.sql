@@ -53,7 +53,8 @@ CREATE TABLE mission (
     start_date DATE,
     end_date DATE,
     objective TEXT, -- singular as per code
-    commander VARCHAR(100), -- added as per code
+    commander_id INT REFERENCES users(user_id) ON DELETE SET NULL, -- restored post-merge
+    fuel_level INT DEFAULT 100, -- restored post-merge
     parent_mission_id INT REFERENCES mission(mission_id) ON DELETE SET NULL,
     created_by INT REFERENCES users(user_id),
     CHECK (end_date IS NULL OR start_date IS NULL OR end_date >= start_date)
@@ -120,7 +121,8 @@ CREATE TABLE spacecraft_subsystem (
     subsystem_id SERIAL PRIMARY KEY,
     spacecraft_id INT REFERENCES spacecraft(spacecraft_id) ON DELETE CASCADE,
     name VARCHAR(100),
-    health_score INT CHECK (health_score BETWEEN 0 AND 100)
+    health_score INT CHECK (health_score BETWEEN 0 AND 100),
+    status VARCHAR(50) DEFAULT 'Good' -- restored post-merge
 );
 
 -- =========================================
@@ -154,10 +156,24 @@ CREATE TABLE alert (
 -- OTHER TABLES
 -- =========================================
 
+-- =========================================
+-- ASTRONAUT & CREW VITALS
+-- =========================================
+
+CREATE TABLE astronaut (
+    astronaut_id SERIAL PRIMARY KEY,
+    name VARCHAR(100),
+    rank VARCHAR(50),
+    role VARCHAR(100),
+    availability VARCHAR(50),
+    current_mission_id INT REFERENCES mission(mission_id) -- Link for Health Page
+);
+
 CREATE TABLE mission_crew (
     crew_id SERIAL PRIMARY KEY,
     mission_id INT REFERENCES mission(mission_id) ON DELETE CASCADE,
-    astronaut_name VARCHAR(100)
+    astronaut_id INT REFERENCES astronaut(astronaut_id) ON DELETE CASCADE,
+    position VARCHAR(100)
 );
 
 CREATE TABLE experiment (
@@ -189,17 +205,8 @@ CREATE TABLE ground_station (
 );
 
 -- =========================================
--- ASTRONAUT & CREW VITALS
+-- CREW VITALS
 -- =========================================
-
-CREATE TABLE astronaut (
-    astronaut_id SERIAL PRIMARY KEY,
-    name VARCHAR(100),
-    rank VARCHAR(50),
-    role VARCHAR(100),
-    availability VARCHAR(50),
-    current_mission_id INT REFERENCES mission(mission_id) -- Link for Health Page
-);
 
 CREATE TABLE crew_vitals (
     vital_id SERIAL PRIMARY KEY,
@@ -276,26 +283,8 @@ FROM information_schema.columns
 WHERE table_name = 'audit_meta';
 
 -- =========================================
--- VIEW
+-- END CORE SCHEMA
 -- =========================================
-
-CREATE OR REPLACE VIEW mission_dashboard AS
-SELECT
-    m.mission_id,
-    m.name AS mission_name,
-    m.status,
-    m.objective,
-    m.fuel_level,
-    COUNT(DISTINCT s.spacecraft_id) AS spacecraft_count,
-    COUNT(DISTINCT mc.crew_id) AS crew_count,
-    COUNT(DISTINCT al.alert_id) AS alert_count,
-    COUNT(DISTINCT e.experiment_id) AS experiment_count
-FROM mission m
-LEFT JOIN spacecraft s ON m.mission_id = s.mission_id
-LEFT JOIN mission_crew mc ON m.mission_id = mc.mission_id
-LEFT JOIN alert al ON m.mission_id = al.mission_id
-LEFT JOIN experiment e ON m.mission_id = e.mission_id
-GROUP BY m.mission_id;
 
 -- Main Risk Table
 CREATE TABLE mission_risk_assessment (

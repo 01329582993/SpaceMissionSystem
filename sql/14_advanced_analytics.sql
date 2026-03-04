@@ -41,12 +41,13 @@ JOIN spacecraft s ON t.spacecraft_id = s.spacecraft_id;
 -- Provides sub-totals of missions by Status and Commander
 CREATE OR REPLACE VIEW v_mission_summary_stats AS
 SELECT 
-    status,
-    commander,
+    m.status,
+    u.username AS commander,
     COUNT(*) as mission_count,
-    COUNT(DISTINCT mission_id) as unique_missions
-FROM mission
-GROUP BY ROLLUP(status, commander)
-ORDER BY status, commander;
+    COUNT(DISTINCT m.mission_id) as unique_missions
+FROM mission m
+LEFT JOIN users u ON m.commander_id = u.user_id
+GROUP BY ROLLUP(m.status, u.username)
+ORDER BY m.status, u.username;
 
 COMMIT;

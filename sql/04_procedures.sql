@@ -27,13 +27,13 @@ $$;
 CREATE OR REPLACE PROCEDURE create_mission(
     m_name VARCHAR,
     m_objective TEXT,
-    m_commander VARCHAR
+    m_commander_id INT
 )
 LANGUAGE plpgsql
 AS $$
 BEGIN
-    INSERT INTO mission(name, status, objective, commander)
-    VALUES (m_name, 'Planned', m_objective, m_commander);
+    INSERT INTO mission(name, status, objective, commander_id)
+    VALUES (m_name, 'Planned', m_objective, m_commander_id);
 END;
 $$;
 

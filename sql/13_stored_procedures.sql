@@ -23,21 +23,23 @@ BEGIN
         RAISE EXCEPTION 'Mission % cannot launch without a crew.', v_mission_name;
     END IF;
 
-    -- 3. Verify Spacecraft exists and has fuel
-    SELECT COUNT(*) INTO v_ship_count 
-    FROM spacecraft 
-    WHERE mission_id = p_mission_id AND fuel_level > 10;
+    -- 3. Verify Spacecraft exists and Mission has fuel
+    SELECT COUNT(*) INTO v_ship_count FROM spacecraft WHERE mission_id = p_mission_id;
     
     IF v_ship_count = 0 THEN
-        RAISE EXCEPTION 'Mission % requires at least one fueled spacecraft (>10%%).', v_mission_name;
+        RAISE EXCEPTION 'Mission % requires at least one assigned spacecraft.', v_mission_name;
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM mission WHERE mission_id = p_mission_id AND fuel_level > 10) THEN
+        RAISE EXCEPTION 'Mission % requires fuel level > 10%% for launch.', v_mission_name;
     END IF;
 
     -- 4. Transition Status
     UPDATE mission SET status = 'Active', start_date = CURRENT_DATE WHERE mission_id = p_mission_id;
 
     -- 5. Advance first phase to Active
-    UPDATE mission_phase SET status = 'Completed' WHERE mission_id = p_mission_id AND phase_name = 'Pre-Launch';
-    UPDATE mission_phase SET status = 'Active' WHERE mission_id = p_mission_id AND phase_name = 'Ascent';
+    UPDATE mission_phase SET status = 'Completed' WHERE mission_id = p_mission_id AND name = 'Pre-Launch';
+    UPDATE mission_phase SET status = 'Active' WHERE mission_id = p_mission_id AND name = 'Ascent';
 
     -- 6. Log success to Audit Log
     INSERT INTO audit_log (action, table_name, record_id, details)

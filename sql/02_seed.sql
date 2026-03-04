@@ -177,6 +177,40 @@ VALUES
 ON CONFLICT (name) DO NOTHING;
 
 -- =====================================
+-- 4.1 SUBSYSTEMS & PHASES (New for Merge verification)
+-- =====================================
+
+INSERT INTO spacecraft_subsystem (spacecraft_id, name, health_score, status)
+SELECT 
+    s.spacecraft_id, 
+    sub.name, 
+    sub.health_score,
+    'Good'
+FROM spacecraft s
+CROSS JOIN (
+    VALUES 
+    ('Thermal Shield', 95), 
+    ('Engine Core', 45), -- Low health for cursor test
+    ('Navigation Unit', 92), 
+    ('Life Support', 30) -- Low health for cursor test
+) AS sub(name, health_score)
+ON CONFLICT DO NOTHING;
+
+INSERT INTO mission_phase (mission_id, name, status)
+SELECT 
+    m.mission_id, 
+    p.name, 
+    'Planned'
+FROM mission m
+CROSS JOIN (
+    VALUES 
+    ('Pre-Launch'), 
+    ('Ascent'), 
+    ('Orbit')
+) AS p(name)
+ON CONFLICT DO NOTHING;
+
+-- =====================================
 -- 5. ASTRONAUTS
 -- =====================================
 
@@ -234,18 +268,18 @@ SELECT
     'SYSTEM_TRACE_LOG_SIGNAL_ALPHA_' || i
 FROM generate_series(1, 120) s(i);
 -- =====================================
--- 7. REFRESH DASHBOARD VIEW
+-- 7. MISSION CREW ASSIGNMENTS
 -- =====================================
 
-DROP VIEW IF EXISTS mission_dashboard;
-CREATE VIEW mission_dashboard AS
-SELECT 
-    m.mission_id,
-    m.name AS mission_name,
-    m.status AS mission_status,
-    m.objective,
-    (SELECT COUNT(*) FROM spacecraft s WHERE s.mission_id = m.mission_id) AS spacecraft_count,
-    (SELECT COUNT(*) FROM alert a WHERE a.mission_id = m.mission_id) AS alert_count
-FROM mission m;
+INSERT INTO mission_crew (mission_id, astronaut_id, position)
+VALUES
+((SELECT mission_id FROM mission WHERE name='ISS Resupply' LIMIT 1), (SELECT astronaut_id FROM astronaut WHERE name='Commander Hudson' LIMIT 1), 'Lead Commander'),
+((SELECT mission_id FROM mission WHERE name='Solar Flare Study' LIMIT 1), (SELECT astronaut_id FROM astronaut WHERE name='Dr. Aris Thorne' LIMIT 1), 'Chief Scientist'),
+((SELECT mission_id FROM mission WHERE name='Deep Space Gateway' LIMIT 1), (SELECT astronaut_id FROM astronaut WHERE name='Sarah Miller' LIMIT 1), 'Systems Engineer')
+ON CONFLICT DO NOTHING;
+
+-- =====================================
+-- 8. END SEEDING
+-- =====================================
 
 COMMIT;

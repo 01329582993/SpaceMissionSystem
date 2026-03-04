@@ -70,7 +70,7 @@ export default function LandingPage() {
           Mission Management Interface
         </motion.p>
 
-        {/* ULTRA-WIDE HORIZONTAL BUTTON */}
+        {/* UPDATED BUTTON: NOW REDIRECTS TO LOGIN */}
         {!loading && (
           <motion.button
             initial={{ opacity: 0, scaleX: 0.5 }}
@@ -81,7 +81,7 @@ export default function LandingPage() {
                 boxShadow: "0 0 100px rgba(255,255,255,0.7)"
             }}
             whileTap={{ scale: 0.98 }}
-            onClick={() => router.push("/dashboard")}
+            onClick={() => router.push("/login")}
             className="mt-32 px-24 md:px-64 py-12 text-4xl md:text-5xl font-black uppercase tracking-[15px] bg-white text-black rounded-full transition-all duration-500 cursor-pointer shadow-[0_0_60px_rgba(255,255,255,0.5)] min-w-[300px] md:min-w-[800px]"
           >
             Launch System
