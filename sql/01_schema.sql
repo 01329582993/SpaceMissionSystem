@@ -10,17 +10,24 @@ DROP TABLE IF EXISTS fuel_log CASCADE;
 DROP TABLE IF EXISTS budget CASCADE;
 DROP TABLE IF EXISTS ground_station CASCADE;
 DROP TABLE IF EXISTS astronaut CASCADE;
-DROP TABLE IF EXISTS crew_vitals CASCADE;         -- NEW
-DROP TABLE IF EXISTS life_support_telemetry CASCADE; -- NEW
+DROP TABLE IF EXISTS crew_vitals CASCADE;
+DROP TABLE IF EXISTS life_support_telemetry CASCADE;
 DROP TABLE IF EXISTS communication_window CASCADE;
 DROP TABLE IF EXISTS telemetry CASCADE;
 DROP TABLE IF EXISTS alert CASCADE;
 DROP TABLE IF EXISTS spacecraft_subsystem CASCADE;
 DROP TABLE IF EXISTS spacecraft CASCADE;
+DROP TABLE IF EXISTS mission_phase CASCADE;
 DROP TABLE IF EXISTS mission_crew CASCADE;
 DROP TABLE IF EXISTS experiment CASCADE;
 DROP TABLE IF EXISTS mission CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
+DROP TABLE IF EXISTS system_alerts CASCADE;
+DROP TABLE IF EXISTS alerts CASCADE;
+DROP TABLE IF EXISTS audit_meta CASCADE;
+DROP TABLE IF EXISTS audit_log CASCADE;
+DROP TABLE IF EXISTS mission_risk_assessment CASCADE;
+DROP TABLE IF EXISTS maintenance_log CASCADE;
 
 -- =========================================
 -- USERS TABLE
@@ -162,6 +169,13 @@ CREATE TABLE experiment (
     status VARCHAR(30) DEFAULT 'pending'
 );
 
+CREATE TABLE mission_phase (
+    phase_id SERIAL PRIMARY KEY,
+    mission_id INT REFERENCES mission(mission_id) ON DELETE CASCADE,
+    name VARCHAR(100),
+    status VARCHAR(30) DEFAULT 'Planned'
+);
+
 CREATE TABLE communication_window (
     window_id SERIAL PRIMARY KEY,
     mission_id INT REFERENCES mission(mission_id) ON DELETE CASCADE,
@@ -215,53 +229,6 @@ CREATE INDEX idx_vitals_astronaut ON crew_vitals(astronaut_id);
 -- FUNCTIONS & TRIGGERS
 -- =========================================
 
-CREATE TABLE system_alerts (
-    alert_id SERIAL PRIMARY KEY,
-    type VARCHAR(50) DEFAULT 'info', -- 'info', 'warning', 'critical'
-    message TEXT NOT NULL,
-    status VARCHAR(20) DEFAULT 'active',
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE OR REPLACE FUNCTION telemetry_alert()
-RETURNS TRIGGER AS $$
-BEGIN
-    IF NEW.temperature > 95 THEN
-        INSERT INTO alert(mission_id, spacecraft_id, message, severity)
-        SELECT mission_id, NEW.spacecraft_id,
-               'High Temperature Detected', 'critical'
-        FROM spacecraft
-        WHERE spacecraft_id = NEW.spacecraft_id;
-    END IF;
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER trg_telemetry_alert
-AFTER INSERT ON telemetry
-FOR EACH ROW
-EXECUTE FUNCTION telemetry_alert();
-
--- NEW: Trigger for Life Support Failures
-CREATE OR REPLACE FUNCTION life_support_alert()
-RETURNS TRIGGER AS $$
-BEGIN
-    IF NEW.o2_level < 18.5 THEN
-        INSERT INTO alert(mission_id, spacecraft_id, message, severity)
-        SELECT mission_id, NEW.spacecraft_id,
-               'CRITICAL: Low Oxygen Levels Detected', 'critical'
-        FROM spacecraft
-        WHERE spacecraft_id = NEW.spacecraft_id;
-    END IF;
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER trg_life_support_alert
-AFTER INSERT ON life_support_telemetry
-FOR EACH ROW
-EXECUTE FUNCTION life_support_alert();
-
 -- Create the Alerts Table
 CREATE TABLE alerts (
     alert_id SERIAL PRIMARY KEY,
@@ -269,6 +236,14 @@ CREATE TABLE alerts (
     message TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     resolved BOOLEAN DEFAULT FALSE
+);
+
+CREATE TABLE system_alerts (
+    alert_id SERIAL PRIMARY KEY,
+    type VARCHAR(50) DEFAULT 'info', -- 'info', 'warning', 'critical'
+    message TEXT NOT NULL,
+    status VARCHAR(20) DEFAULT 'active',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Create the Audit Log Table (if not already there)
@@ -283,24 +258,6 @@ CREATE TABLE IF NOT EXISTS audit_log (
     details TEXT
 );
 -- Create the logic function
-CREATE OR REPLACE FUNCTION log_changes()
-RETURNS TRIGGER AS $$
-BEGIN
-    IF (TG_OP = 'INSERT') THEN
-        INSERT INTO audit_log (action, table_name, record_id, new_data, details)
-        VALUES ('INSERT', TG_TABLE_NAME, NEW.alert_id, row_to_json(NEW), 'NEW_THREAT_DETECTED');
-    ELSIF (TG_OP = 'UPDATE') THEN
-        INSERT INTO audit_log (action, table_name, record_id, old_data, new_data, details)
-        VALUES ('UPDATE', TG_TABLE_NAME, OLD.alert_id, row_to_json(OLD), row_to_json(NEW), 'THREAT_RESOLVED_OR_MODIFIED');
-    END IF;
-    RETURN NULL;
-END;
-$$ LANGUAGE plpgsql;
-
--- Attach the trigger to the alerts table
-CREATE TRIGGER trg_audit_alerts
-AFTER INSERT OR UPDATE ON alerts
-FOR EACH ROW EXECUTE FUNCTION log_changes();
 
 -- 1. Remove the old version if it exists
 DROP TABLE IF EXISTS audit_meta;
@@ -318,31 +275,7 @@ CREATE TABLE audit_meta (
 -- 3. Verify the columns are there
 SELECT column_name, data_type 
 FROM information_schema.columns 
-WHERE table_name = 'audit_meta';;
-
--- Optional: Add a sample link to log_id 120 (or any ID you have)
-INSERT INTO audit_meta (log_id, source_ip, user_agent, payload_size_kb) 
-VALUES (120, '192.168.1.44', 'Mozilla/5.0 (Windows NT 10.0)', 1.25);
-
-CREATE OR REPLACE FUNCTION prevent_overlap()
-RETURNS TRIGGER AS $$
-BEGIN
-    IF EXISTS (
-        SELECT 1 FROM communication_window
-        WHERE station_name = NEW.station_name
-          AND NEW.start_time < end_time
-          AND NEW.end_time > start_time
-    ) THEN
-        RAISE EXCEPTION 'Schedule conflict detected';
-    END IF;
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER trg_no_overlap
-BEFORE INSERT ON communication_window
-FOR EACH ROW
-EXECUTE FUNCTION prevent_overlap();
+WHERE table_name = 'audit_meta';
 
 -- =========================================
 -- VIEW
@@ -378,6 +311,14 @@ CREATE TABLE mission_risk_assessment (
     risk_score NUMERIC(5,2),
     risk_level VARCHAR(20),
     calculated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE maintenance_log (
+    log_id SERIAL PRIMARY KEY,
+    subsystem_id INT REFERENCES spacecraft_subsystem(subsystem_id) ON DELETE CASCADE,
+    description TEXT,
+    log_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    next_maintenance_due DATE
 );
 
 COMMIT;

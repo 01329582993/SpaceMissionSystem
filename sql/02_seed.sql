@@ -217,9 +217,12 @@ VALUES
 ((SELECT astronaut_id FROM astronaut WHERE name='Sarah Miller' LIMIT 1), 68, 118, 78, 36.5, 10)
 ON CONFLICT DO NOTHING;
 
--- AUDIT META
-INSERT INTO audit_meta (log_id, origin_node, auth_level, request_method, process_signature) 
-VALUES (120, 'UPPER_LAB_4', 'SUPERUSER_OVERRIDE', 'REST_API', '0xAFF99');
+-- AUDIT META (only insert if a valid audit_log record exists)
+INSERT INTO audit_meta (log_id, origin_node, auth_level, request_method, process_signature)
+SELECT log_id, 'UPPER_LAB_4', 'SUPERUSER_OVERRIDE', 'REST_API', '0xAFF99'
+FROM audit_log
+ORDER BY log_id
+LIMIT 1;
 
 INSERT INTO telemetry (spacecraft_id, temperature, voltage, fuel_level, radiation)
 SELECT spacecraft_id, 22.0, 120.0, 95.0, 0.01 FROM spacecraft

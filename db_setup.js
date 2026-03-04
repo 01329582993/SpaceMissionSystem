@@ -40,6 +40,7 @@ async function setup() {
         console.log(" Database Setup Complete!");
     } catch (err) {
         console.error(" Setup Failed:", err.message);
+        process.exit(1);
     } finally {
         await pool.end();
     }

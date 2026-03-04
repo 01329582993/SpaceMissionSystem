@@ -15,13 +15,13 @@ async function getDashboardData() {
 
 async function getAggregatedStats() {
   try {
-    const spacecraft = await pool.query("SELECT fuel_level FROM spacecraft");
-    const missions = await pool.query("SELECT mission_status FROM mission_dashboard");
+    const spacecraft = await pool.query("SELECT spacecraft_id FROM spacecraft");
+    const missions = await pool.query("SELECT * FROM mission_dashboard");
     const astronauts = await pool.query("SELECT astronaut_id FROM astronaut");
 
     const total = spacecraft.rows.length;
-    const operational = spacecraft.rows.filter((s: any) => s.fuel_level > 15).length;
-    const avgFuel = spacecraft.rows.reduce((acc: number, curr: any) => acc + curr.fuel_level, 0) / (total || 1);
+    const operational = missions.rows.filter((m: any) => m.fuel_level > 15).length;
+    const avgFuel = missions.rows.reduce((acc: number, curr: any) => acc + (curr.fuel_level || 0), 0) / (missions.rows.length || 1);
     const activeMissions = missions.rows.filter((m: any) => m.mission_status === 'Active').length;
 
     return {
@@ -46,14 +46,14 @@ export default async function DashboardPage() {
   return (
     <CosmoLayout>
       <div style={pageContainer}>
-        
+
         {/* TOP TACTICAL NAVIGATION */}
         <nav style={tacticalNav}>
           <div style={logoSection}>
             <div style={squareIcon}></div>
-            <h1 style={navTitle}>COSMO_SYS / <span style={{opacity: 0.8, color: '#00ffd5'}}>CORE_DASH</span></h1>
+            <h1 style={navTitle}>COSMO_SYS / <span style={{ opacity: 0.8, color: '#00ffd5' }}>CORE_DASH</span></h1>
           </div>
-          
+
           <div style={navMeta}>
             <div style={metaItem}>
               <span style={metaLabel}>NET_STATUS</span>
@@ -72,7 +72,7 @@ export default async function DashboardPage() {
 
         {/* ANALYTICS HUD */}
         <section style={hudWrapper}>
-           <AnalyticsDashboard stats={stats || undefined} />
+          <AnalyticsDashboard stats={stats || undefined} />
         </section>
 
         {/* SECTION HEADER */}
@@ -81,20 +81,20 @@ export default async function DashboardPage() {
           <div style={stripLine}></div>
           <div style={stripTag}>V_4.0.5</div>
         </div>
-        
+
         {/* GRID LAYOUT */}
         <div style={gridContainer}>
           {missions.map((m: any) => (
             <div key={m.mission_id} className="tactical-card" style={missionCard}>
               <div style={cardGlow}></div>
-              
+
               <div style={cardTop}>
                 <div style={missionId}>ID_{m.mission_id.toString().padStart(3, '0')}</div>
                 <div style={statusTag(m.mission_status)}>{m.mission_status}</div>
               </div>
 
               <h2 style={cardTitle}>{m.mission_name}</h2>
-              
+
               <p style={cardDescription}>
                 {m.objective || "Standard protocol mission parameters active. Telemetry link established."}
               </p>
@@ -106,7 +106,7 @@ export default async function DashboardPage() {
                 </div>
                 <div style={dataPiece}>
                   <div style={dataLabel}>ERRORS</div>
-                  <div style={{...dataValue, color: m.alert_count > 0 ? '#ff0055' : '#00ffd5'}}>
+                  <div style={{ ...dataValue, color: m.alert_count > 0 ? '#ff0055' : '#00ffd5' }}>
                     {m.alert_count || 0}
                   </div>
                 </div>
@@ -120,7 +120,8 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      <style dangerouslySetInnerHTML={{ __html: `
+      <style dangerouslySetInnerHTML={{
+        __html: `
         @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;500;800&display=swap');
         
         .tactical-btn {

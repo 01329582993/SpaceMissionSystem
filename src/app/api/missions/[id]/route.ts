@@ -13,7 +13,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
 
     // Optional: Get spacecraft assigned to this mission
     const craftRes = await pool.query(
-      "SELECT name, fuel_level FROM spacecraft WHERE mission_id = $1", [params.id]
+      "SELECT name FROM spacecraft WHERE mission_id = $1", [params.id]
     );
 
     return NextResponse.json({

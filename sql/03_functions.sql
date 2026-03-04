@@ -60,11 +60,16 @@ $$ LANGUAGE plpgsql;
 -- ADD FUEL RATE + ENGINE LOAD
 -- =========================================
 
-ALTER TABLE spacecraft
-ADD COLUMN engine_efficiency INT DEFAULT 100;  -- 0–100
-
-ALTER TABLE mission
-ADD COLUMN distance_remaining INT DEFAULT 100000; -- km
+-- Add columns only if they don't exist
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'spacecraft' AND column_name = 'engine_efficiency') THEN
+        ALTER TABLE spacecraft ADD COLUMN engine_efficiency INT DEFAULT 100;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'mission' AND column_name = 'distance_remaining') THEN
+        ALTER TABLE mission ADD COLUMN distance_remaining INT DEFAULT 100000;
+    END IF;
+END $$;
 
 -- =========================================
 -- FUEL CALCULATION FUNCTION
@@ -108,3 +113,32 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- 4. Audit Log Function
+CREATE OR REPLACE FUNCTION log_changes()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF (TG_OP = 'INSERT') THEN
+        INSERT INTO audit_log (action, table_name, record_id, new_data, details)
+        VALUES ('INSERT', TG_TABLE_NAME, NEW.alert_id, row_to_json(NEW), 'NEW_THREAT_DETECTED');
+    ELSIF (TG_OP = 'UPDATE') THEN
+        INSERT INTO audit_log (action, table_name, record_id, old_data, new_data, details)
+        VALUES ('UPDATE', TG_TABLE_NAME, OLD.alert_id, row_to_json(OLD), row_to_json(NEW), 'THREAT_RESOLVED_OR_MODIFIED');
+    END IF;
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+-- 5. Life Support Alert Function
+CREATE OR REPLACE FUNCTION life_support_alert()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.o2_level < 18.5 THEN
+        INSERT INTO alert(mission_id, spacecraft_id, message, severity)
+        SELECT mission_id, NEW.spacecraft_id,
+               'CRITICAL: Low Oxygen Levels Detected', 'critical'
+        FROM spacecraft
+        WHERE spacecraft_id = NEW.spacecraft_id;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;

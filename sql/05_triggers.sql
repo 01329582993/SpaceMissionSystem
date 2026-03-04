@@ -14,6 +14,11 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS trg_check_spacecraft_mission ON spacecraft;
+CREATE TRIGGER trg_check_spacecraft_mission
+BEFORE UPDATE OF mission_id ON spacecraft
+FOR EACH ROW EXECUTE FUNCTION trg_check_spacecraft_mission();
+
 -- 2. Auto-Update Mission Status
 -- If all phases are marked 'Completed', auto-complete the mission.
 CREATE OR REPLACE FUNCTION trg_update_mission_status()
@@ -33,21 +38,7 @@ FOR EACH ROW
 EXECUTE FUNCTION trg_update_mission_status();
 
 -- 3. Audit Logging
-CREATE OR REPLACE FUNCTION fn_audit_log()
-RETURNS TRIGGER AS $$
-BEGIN
-    INSERT INTO audit_log (action, table_name, record_id, old_data, new_data, changed_at)
-    VALUES (
-        TG_OP,
-        TG_TABLE_NAME,
-        NULL, 
-        row_to_json(OLD),
-        row_to_json(NEW),
-        CURRENT_TIMESTAMP
-    );
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
+-- Already defined in 03_functions.sql: fn_audit_log
 
 -- Apply Audit to Core Tables
 DROP TRIGGER IF EXISTS trg_audit_users ON users;
@@ -71,6 +62,14 @@ CREATE TRIGGER trg_no_overlap
 BEFORE INSERT OR UPDATE ON communication_window
 FOR EACH ROW EXECUTE FUNCTION prevent_overlap();
 
+-- 5. Alerts Audit
+DROP TRIGGER IF EXISTS trg_audit_alerts ON alerts;
 CREATE TRIGGER trg_audit_alerts
 AFTER INSERT OR UPDATE OR DELETE ON alerts
 FOR EACH ROW EXECUTE FUNCTION log_changes();
+
+-- 6. Life Support Alerts
+DROP TRIGGER IF EXISTS trg_life_support_alert ON life_support_telemetry;
+CREATE TRIGGER trg_life_support_alert
+AFTER INSERT ON life_support_telemetry
+FOR EACH ROW EXECUTE FUNCTION life_support_alert();

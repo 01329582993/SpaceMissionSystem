@@ -6,7 +6,7 @@ import OrbitalTracker from '@/src/components/OrbitalTracker';
 async function getSpacecraft() {
     try {
         const result = await pool.query(`
-            SELECT s.spacecraft_id, s.name, s.model, s.fuel_level, s.health_status, s.mission_id, m.mission_name
+            SELECT s.spacecraft_id, s.name, s.model, m.fuel_level, s.health_status, s.mission_id, m.mission_name
             FROM spacecraft s
             LEFT JOIN mission_dashboard m ON s.mission_id = m.mission_id
             ORDER BY s.name
@@ -46,13 +46,13 @@ export default async function SpacecraftPage() {
                                 <h3 style={shipNameStyle}>{s.name}</h3>
                                 <span style={idBadge}>ID_{s.spacecraft_id.toString().padStart(3, '0')}</span>
                             </div>
-                            
+
                             <p style={modelStyle}>{s.model || 'CLASSIFIED_CLASS'}</p>
 
                             <div style={fuelContainer}>
                                 <div style={fuelLabelRow}>
                                     <span style={labelStyle}>FUEL_RESERVES</span>
-                                    <span style={{...valueStyle, color: s.fuel_level < 20 ? '#ff0055' : '#00ffd5'}}>
+                                    <span style={{ ...valueStyle, color: s.fuel_level < 20 ? '#ff0055' : '#00ffd5' }}>
                                         {s.fuel_level}%
                                     </span>
                                 </div>
@@ -89,7 +89,8 @@ export default async function SpacecraftPage() {
                 </div>
             </div>
 
-            <style dangerouslySetInnerHTML={{ __html: `
+            <style dangerouslySetInnerHTML={{
+                __html: `
                 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;800&family=Orbitron:wght@700;900&display=swap');
                 .tactical-btn:hover { background: #00ffd5 !important; color: #000 !important; box-shadow: 0 0 20px #00ffd5; }
                 .tactical-card:hover { border-color: #00ffd5 !important; background: rgba(255,255,255,0.02) !important; }
