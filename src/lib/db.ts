@@ -10,8 +10,8 @@ export const pool = new Pool({
 
 // Logic to check connection on boot
 pool.query("SELECT NOW()", (err, res) => {
-  if (err) console.error("❌ DB connection failed:", err.message);
-  else console.log("✅ DB connected to CosmoTrack Core!");
+  if (err) console.error("DB connection failed:", err);
+  else console.log("DB connected! Current time:", res.rows[0].now);
 });
 
 // THIS LINE FIXES YOUR ERROR:

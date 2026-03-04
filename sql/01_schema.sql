@@ -52,10 +52,8 @@ CREATE TABLE mission (
     status VARCHAR(30) DEFAULT 'Planned',
     start_date DATE,
     end_date DATE,
-    objective TEXT,
-    commander_id INT REFERENCES users(user_id),
-    commander VARCHAR(100),
-    fuel_level INT DEFAULT 100,
+    objective TEXT, -- singular as per code
+    commander VARCHAR(100), -- added as per code
     parent_mission_id INT REFERENCES mission(mission_id) ON DELETE SET NULL,
     created_by INT REFERENCES users(user_id),
     CHECK (end_date IS NULL OR start_date IS NULL OR end_date >= start_date)

@@ -71,10 +71,9 @@ SELECT
     m.objective,
     m.start_date,
     m.end_date,
-    m.fuel_level,
     (SELECT COUNT(*) FROM spacecraft s WHERE s.mission_id = m.mission_id) AS spacecraft_count,
     (SELECT COUNT(*) FROM mission_crew mc WHERE mc.mission_id = m.mission_id) AS astronaut_count,
-    (SELECT COUNT(*) FROM alert a WHERE a.mission_id = m.mission_id) AS alert_count,
+    (SELECT COUNT(*) FROM alert a WHERE a.mission_id = m.mission_id AND a.is_resolved = FALSE) AS alert_count,
     (SELECT COUNT(*) FROM experiment e WHERE e.mission_id = m.mission_id) AS experiment_count
 FROM mission m;
 

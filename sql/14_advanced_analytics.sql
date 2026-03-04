@@ -12,7 +12,7 @@ SELECT
     COUNT(mc.mission_id) as mission_count,
     DENSE_RANK() OVER (ORDER BY COUNT(mc.mission_id) DESC) as experience_rank
 FROM astronaut a
-LEFT JOIN mission_crew mc ON a.name = mc.astronaut_name
+LEFT JOIN mission_crew mc ON a.astronaut_id = mc.astronaut_id
 GROUP BY a.astronaut_id, a.name, a.rank;
 
 -- 2. WINDOWING: Telemetry Moving Averages
