@@ -29,10 +29,17 @@ async function setup() {
         await runSQL('sql/04_procedures.sql');
         await runSQL('sql/05_triggers.sql');
         await runSQL('sql/09_triggers_views.sql');
+        await runSQL('sql/10_audit_logging.sql');
+        await runSQL('sql/11_operational_analytics.sql');
+        await runSQL('sql/12_integrity_constraints.sql');
+        await runSQL('sql/13_stored_procedures.sql');
+        await runSQL('sql/14_advanced_analytics.sql');
+        await runSQL('sql/15_recursive_missions.sql');
+        await runSQL('sql/16_procedural_utils.sql');
 
-        console.log("✅ Database Setup Complete!");
+        console.log(" Database Setup Complete!");
     } catch (err) {
-        console.error("❌ Setup Failed:", err.message);
+        console.error(" Setup Failed:", err.message);
     } finally {
         await pool.end();
     }
