@@ -71,13 +71,17 @@ export default async function SpacecraftPage() {
                                 <p style={missionText}>{s.mission_name || 'STANDBY_HANGAR'}</p>
                             </div>
 
+                            {/* --- MODIFIED FOOTER WITH TWO LINKS --- */}
                             <div style={cardFooter}>
-                                <div style={statusWrapper}>
-                                    <div style={statusDot(s.health_status)} />
-                                    <span style={statusText(s.health_status)}>{s.health_status}</span>
-                                </div>
-                                <Link href={`/api/telemetry?id=${s.spacecraft_id}`} style={telemetryLink}>
-                                    UPLINK_DATA →
+                                <Link href={`/health/${s.spacecraft_id}`} style={{ textDecoration: 'none' }}>
+                                    <div style={statusWrapper}>
+                                        <div style={statusDot(s.health_status)} />
+                                        <span style={statusText(s.health_status)}>BIO_LINK</span>
+                                    </div>
+                                </Link>
+
+                                <Link href={`/telemetry/${s.spacecraft_id}`} className="telemetry-hover" style={telemetryLink}>
+                                    SYSTEM_UPLINK →
                                 </Link>
                             </div>
                         </div>
@@ -89,6 +93,7 @@ export default async function SpacecraftPage() {
                 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;800&family=Orbitron:wght@700;900&display=swap');
                 .tactical-btn:hover { background: #00ffd5 !important; color: #000 !important; box-shadow: 0 0 20px #00ffd5; }
                 .tactical-card:hover { border-color: #00ffd5 !important; background: rgba(255,255,255,0.02) !important; }
+                .telemetry-hover:hover { color: #00ffd5 !important; text-shadow: 0 0 10px #00ffd5; }
             `}} />
         </CosmoLayout>
     );
@@ -114,8 +119,8 @@ const valueStyle = { fontSize: '0.8rem', fontWeight: 800 };
 const progressBarBg = { width: '100%', height: '4px', backgroundColor: '#111' };
 const missionInfo = { marginBottom: '30px' };
 const missionText = { margin: '5px 0 0 0', fontSize: '0.85rem', color: '#FFF' };
-const cardFooter: React.CSSProperties = { display: 'flex', justifyContent: 'space-between', borderTop: '1px solid #1a1a1a', paddingTop: '20px' };
-const statusWrapper = { display: 'flex', alignItems: 'center', gap: '8px' };
+const cardFooter: React.CSSProperties = { display: 'flex', justifyContent: 'space-between', borderTop: '1px solid #1a1a1a', paddingTop: '20px', alignItems: 'center' };
+const statusWrapper = { display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' };
 const statusDot = (s: string) => ({ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: s === 'Operational' ? '#00ffd5' : '#ff0055', boxShadow: `0 0 8px ${s === 'Operational' ? '#00ffd5' : '#ff0055'}` });
-const statusText = (s: string) => ({ fontSize: '0.7rem', fontWeight: 800, color: s === 'Operational' ? '#00ffd5' : '#ff0055' });
-const telemetryLink = { color: '#FFF', textDecoration: 'none', fontSize: '0.7rem', fontWeight: 800, letterSpacing: '1px' };
+const statusText = (s: string) => ({ fontSize: '0.7rem', fontWeight: 800, color: s === 'Operational' ? '#00ffd5' : '#ff0055', letterSpacing: '1px' });
+const telemetryLink = { color: '#FFF', textDecoration: 'none', fontSize: '0.7rem', fontWeight: 800, letterSpacing: '1px', transition: '0.2s' };

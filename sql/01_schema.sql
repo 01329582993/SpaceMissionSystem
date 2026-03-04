@@ -363,4 +363,18 @@ LEFT JOIN alert al ON m.mission_id = al.mission_id
 LEFT JOIN experiment e ON m.mission_id = e.mission_id
 GROUP BY m.mission_id;
 
+-- Main Risk Table
+CREATE TABLE mission_risk_assessment (
+    risk_id SERIAL PRIMARY KEY,
+    mission_id INT NOT NULL,
+    fuel_level NUMERIC(5,2),
+    radiation_level NUMERIC(5,2),
+    health_score NUMERIC(5,2),
+    budget_remaining NUMERIC(12,2),
+    duration_days INT,
+    risk_score NUMERIC(5,2),
+    risk_level VARCHAR(20),
+    calculated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 COMMIT;
