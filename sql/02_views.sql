@@ -8,9 +8,10 @@ SELECT
     m.status,
     m.start_date,
     m.end_date,
-    m.commander,
+    u.username AS commander,
     (SELECT COUNT(*) FROM spacecraft s WHERE s.mission_id = m.mission_id) AS spacecraft_count
 FROM mission m
+LEFT JOIN users u ON m.commander_id = u.user_id
 WHERE m.status IN ('Active', 'Planned');
 
 -- 2. Mission Summary with Crew Count
@@ -28,7 +29,7 @@ SELECT
     m.mission_id,
     m.name,
     m.status,
-    COUNT(mc.astronaut_name) as crew_count
+    COUNT(mc.astronaut_id) as crew_count
 FROM mission m
 LEFT JOIN mission_crew mc ON m.mission_id = mc.mission_id
 GROUP BY m.mission_id, m.name, m.status;
