@@ -1,18 +1,11 @@
 "use client";
-
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import CosmoLayout from '@/src/components/CosmoLayout';
 
 export default function NewSpacecraftPage() {
     const router = useRouter();
-    const [formData, setFormData] = useState({
-        name: '',
-        model: '',
-        fuel_level: 100,
-        mission_id: ''
-    });
+    const [formData, setFormData] = useState({ name: '', model: '', fuel_level: 100, mission_id: '' });
     const [missions, setMissions] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -20,7 +13,7 @@ export default function NewSpacecraftPage() {
     useEffect(() => {
         fetch('/api/missions')
             .then(res => res.json())
-            .then(data => setMissions(data))
+            .then(data => setMissions(Array.isArray(data) ? data : [])) // Ensure array
             .catch(err => console.error("Failed to load missions:", err));
     }, []);
 
@@ -28,7 +21,6 @@ export default function NewSpacecraftPage() {
         e.preventDefault();
         setLoading(true);
         setError('');
-
         try {
             const res = await fetch('/api/spacecraft', {
                 method: 'POST',
@@ -38,12 +30,7 @@ export default function NewSpacecraftPage() {
                     mission_id: formData.mission_id ? parseInt(formData.mission_id) : null
                 })
             });
-
-            if (!res.ok) {
-                const data = await res.json();
-                throw new Error(data.error || 'Failed to register spacecraft');
-            }
-
+            if (!res.ok) throw new Error('Failed to register spacecraft');
             router.push('/spacecraft');
             router.refresh();
         } catch (err: any) {
@@ -55,159 +42,95 @@ export default function NewSpacecraftPage() {
 
     return (
         <CosmoLayout>
-            <div style={{ padding: '60px', color: 'white', fontFamily: 'sans-serif' }}>
-                <header style={{ marginBottom: '40px', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '20px' }}>
-                    <h1 style={{ color: '#4cc9f0', fontSize: '2.5rem', fontWeight: '800', margin: 0, letterSpacing: '-1px' }}>VESSEL REGISTRATION</h1>
-                    <p style={{ color: 'rgba(255,255,255,0.5)', margin: '5px 0 0 0', textTransform: 'uppercase', letterSpacing: '2px', fontSize: '0.8rem' }}>ADDING NEW ASSETS TO THE COSMOTRACK FLEET</p>
+            <div style={pageContainer}>
+                <header style={headerStyle}>
+                    <h1 style={titleStyle}>VESSEL_REGISTRATION</h1>
+                    <p style={subTitleStyle}>ENROLLING_ASSETS // SECTOR_7_HANGAR</p>
                 </header>
 
-                <form onSubmit={handleSubmit} style={{
-                    maxWidth: '800px',
-                    backgroundColor: 'rgba(27, 29, 41, 0.7)',
-                    backdropFilter: 'blur(10px)',
-                    padding: '40px',
-                    borderRadius: '20px',
-                    border: '1px solid rgba(255,255,255,0.05)',
-                    boxShadow: '0 20px 50px rgba(0,0,0,0.3)'
-                }}>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px', marginBottom: '30px' }}>
-                        <div>
-                            <label style={{ display: 'block', color: '#4cc9f0', fontSize: '0.75rem', fontWeight: '800', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '1px' }}>
-                                Spacecraft Name
-                            </label>
+                <form onSubmit={handleSubmit} style={formStyle}>
+                    <div style={gridRow}>
+                        <div style={inputGroup}>
+                            <label style={labelStyle}>SPACECRAFT_NAME</label>
                             <input
                                 type="text"
                                 required
-                                placeholder="e.g. Discovery-7"
+                                placeholder="E.G. TITAN_IV"
                                 value={formData.name}
                                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                style={{
-                                    width: '100%',
-                                    backgroundColor: 'rgba(255,255,255,0.03)',
-                                    border: '1px solid rgba(255,255,255,0.1)',
-                                    borderRadius: '10px',
-                                    padding: '16px',
-                                    color: 'white',
-                                    fontSize: '1rem',
-                                    outline: 'none'
-                                }}
+                                style={inputStyle}
                             />
                         </div>
-
-                        <div>
-                            <label style={{ display: 'block', color: '#4cc9f0', fontSize: '0.75rem', fontWeight: '800', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '1px' }}>
-                                Model / Class
-                            </label>
+                        <div style={inputGroup}>
+                            <label style={labelStyle}>MODEL_CLASS</label>
                             <input
                                 type="text"
                                 required
-                                placeholder="e.g. Mk.4 Surveyor"
+                                placeholder="E.G. MK-SERIES"
                                 value={formData.model}
                                 onChange={(e) => setFormData({ ...formData, model: e.target.value })}
-                                style={{
-                                    width: '100%',
-                                    backgroundColor: 'rgba(255,255,255,0.03)',
-                                    border: '1px solid rgba(255,255,255,0.1)',
-                                    borderRadius: '10px',
-                                    padding: '16px',
-                                    color: 'white',
-                                    fontSize: '1rem',
-                                    outline: 'none'
-                                }}
+                                style={inputStyle}
                             />
                         </div>
                     </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px', marginBottom: '40px' }}>
-                        <div>
-                            <label style={{ display: 'block', color: '#4cc9f0', fontSize: '0.75rem', fontWeight: '800', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '1px' }}>
-                                Initial Fuel Reserves (%)
-                            </label>
+                    <div style={gridRow}>
+                        <div style={inputGroup}>
+                            <label style={labelStyle}>INITIAL_FUEL_%</label>
                             <input
                                 type="number"
-                                min="0"
-                                max="100"
+                                min="0" max="100"
                                 required
                                 value={formData.fuel_level}
                                 onChange={(e) => setFormData({ ...formData, fuel_level: parseInt(e.target.value) })}
-                                style={{
-                                    width: '100%',
-                                    backgroundColor: 'rgba(255,255,255,0.03)',
-                                    border: '1px solid rgba(255,255,255,0.1)',
-                                    borderRadius: '10px',
-                                    padding: '16px',
-                                    color: 'white',
-                                    fontSize: '1rem',
-                                    outline: 'none'
-                                }}
+                                style={inputStyle}
                             />
                         </div>
-
-                        <div>
-                            <label style={{ display: 'block', color: '#4cc9f0', fontSize: '0.75rem', fontWeight: '800', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '1px' }}>
-                                Mission Assignment
-                            </label>
+                        <div style={inputGroup}>
+                            <label style={labelStyle}>MISSION_ASSIGNMENT</label>
                             <select
                                 value={formData.mission_id}
                                 onChange={(e) => setFormData({ ...formData, mission_id: e.target.value })}
-                                style={{
-                                    width: '100%',
-                                    backgroundColor: 'rgba(11, 13, 23, 0.9)',
-                                    border: '1px solid rgba(255,255,255,0.1)',
-                                    borderRadius: '10px',
-                                    padding: '16px',
-                                    color: 'white',
-                                    fontSize: '1rem',
-                                    outline: 'none',
-                                    appearance: 'none',
-                                    cursor: 'pointer'
-                                }}
+                                style={selectStyle}
                             >
-                                <option value="">STAY IN HANGAR (UNASSIGNED)</option>
-                                {missions.map(m => <option key={m.mission_id} value={m.mission_id}>{m.mission_name.toUpperCase()}</option>)}
+                                <option value="">STAY_IN_HANGAR</option>
+                                {missions.map(m => (
+                                    <option key={m.mission_id} value={m.mission_id}>
+                                        {/* Added Optional Chaining to prevent crash */}
+                                        {m.mission_name?.toUpperCase() || `MISSION_${m.mission_id}`}
+                                    </option>
+                                ))}
                             </select>
                         </div>
                     </div>
 
-                    {error && (
-                        <div style={{
-                            color: '#f72585',
-                            backgroundColor: 'rgba(247, 37, 133, 0.1)',
-                            padding: '20px',
-                            borderRadius: '10px',
-                            marginBottom: '30px',
-                            fontSize: '0.9rem',
-                            border: '1px solid rgba(247, 37, 133, 0.3)',
-                            fontWeight: 'bold'
-                        }}>
-                            ⚠️ REGISTRATION FAILED: {error}
-                        </div>
-                    )}
+                    {error && <div style={errorBox}>⚠️ ERROR: {error.toUpperCase()}</div>}
 
-                    <button
-                        type="submit"
-                        disabled={loading}
-                        style={{
-                            width: '100%',
-                            backgroundColor: loading ? 'rgba(255,255,255,0.1)' : '#4cc9f0',
-                            color: loading ? 'rgba(255,255,255,0.3)' : '#0b0d17',
-                            padding: '18px',
-                            borderRadius: '12px',
-                            border: 'none',
-                            fontSize: '1rem',
-                            fontWeight: 'bold',
-                            cursor: loading ? 'not-allowed' : 'pointer',
-                            transition: 'all 0.3s ease',
-                            textTransform: 'uppercase',
-                            letterSpacing: '2px',
-                            boxShadow: loading ? 'none' : '0 10px 30px rgba(76, 201, 240, 0.3)'
-                        }}
-                    >
-                        {loading ? 'TRANSMITTING DESIGNATION...' : 'REGISTER VESSEL'}
+                    <button type="submit" disabled={loading} className="submit-btn" style={submitBtnStyle}>
+                        {loading ? 'TRANSMITTING...' : 'FINALIZE_REGISTRATION'}
                     </button>
                 </form>
             </div>
+
+            <style dangerouslySetInnerHTML={{ __html: `
+                @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;800&family=Orbitron:wght@700;900&display=swap');
+                .submit-btn:hover { background: #00ffd5 !important; color: #000 !important; box-shadow: 0 0 30px #00ffd5; }
+                input:focus, select:focus { border-color: #00ffd5 !important; outline: none; }
+            `}} />
         </CosmoLayout>
     );
 }
 
+/* --- FORM STYLES --- */
+const pageContainer: React.CSSProperties = { padding: "60px", backgroundColor: "#000", minHeight: "100vh", color: "#FFF", fontFamily: "'JetBrains Mono', monospace" };
+const headerStyle = { marginBottom: '50px', borderBottom: '1px solid #222', paddingBottom: '30px' };
+const titleStyle = { color: '#FFF', fontSize: '2rem', fontWeight: 900, fontFamily: "'Orbitron', sans-serif", letterSpacing: '2px' };
+const subTitleStyle = { color: '#00ffd5', fontSize: '0.7rem', fontWeight: 800, marginTop: '5px' };
+const formStyle = { maxWidth: '900px', background: '#080808', padding: '40px', border: '1px solid #1a1a1a' };
+const gridRow = { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px', marginBottom: '30px' };
+const inputGroup = { display: 'flex', flexDirection: 'column' as const };
+const labelStyle = { fontSize: '0.65rem', color: '#555', fontWeight: 800, marginBottom: '10px', letterSpacing: '1px' };
+const inputStyle = { backgroundColor: '#000', border: '1px solid #333', padding: '15px', color: '#FFF', fontSize: '0.9rem', fontFamily: "'JetBrains Mono', monospace" };
+const selectStyle = { backgroundColor: '#000', border: '1px solid #333', padding: '15px', color: '#FFF', cursor: 'pointer', fontFamily: "'JetBrains Mono', monospace" };
+const errorBox = { color: '#ff0055', border: '1px solid #ff0055', padding: '15px', marginBottom: '30px', fontSize: '0.8rem', fontWeight: 800 };
+const submitBtnStyle = { width: '100%', backgroundColor: '#FFF', color: '#000', padding: '20px', border: 'none', fontSize: '0.9rem', fontWeight: 800, cursor: 'pointer', letterSpacing: '2px' };

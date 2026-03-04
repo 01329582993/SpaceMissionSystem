@@ -1,17 +1,11 @@
 "use client";
-
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import CosmoLayout from '@/src/components/CosmoLayout';
 
 export default function NewPersonnelPage() {
     const router = useRouter();
-    const [formData, setFormData] = useState({
-        name: '',
-        role: '',
-        rank: ''
-    });
+    const [formData, setFormData] = useState({ name: '', role: '', rank: '' });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
@@ -48,134 +42,88 @@ export default function NewPersonnelPage() {
 
     return (
         <CosmoLayout>
-            <div style={{ padding: '60px', color: 'white', fontFamily: 'sans-serif' }}>
-                <header style={{ marginBottom: '40px', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '20px' }}>
-                    <h1 style={{ color: '#4cc9f0', fontSize: '2.5rem', fontWeight: '800', margin: 0, letterSpacing: '-1px' }}>OFFICER ENLISTMENT</h1>
-                    <p style={{ color: 'rgba(255,255,255,0.5)', margin: '5px 0 0 0', textTransform: 'uppercase', letterSpacing: '2px', fontSize: '0.8rem' }}>REGISTERING NEW PERSONNEL FOR ACTIVE DUTY</p>
+            <div style={containerStyle}>
+                <header style={headerStyle}>
+                    <h1 style={titleStyle}>OFFICER_ENLISTMENT</h1>
+                    <p style={subTitleStyle}>CREATE_NEW_SERVICE_RECORD // ALPHA_SECTOR</p>
                 </header>
 
-                <form onSubmit={handleSubmit} style={{
-                    maxWidth: '800px',
-                    backgroundColor: 'rgba(27, 29, 41, 0.7)',
-                    backdropFilter: 'blur(10px)',
-                    padding: '40px',
-                    borderRadius: '20px',
-                    border: '1px solid rgba(255,255,255,0.05)',
-                    boxShadow: '0 20px 50px rgba(0,0,0,0.3)'
-                }}>
-                    <div style={{ marginBottom: '30px' }}>
-                        <label style={{ display: 'block', color: '#4cc9f0', fontSize: '0.75rem', fontWeight: '800', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '1px' }}>
-                            Full Name
-                        </label>
+                <form onSubmit={handleSubmit} style={formBoxStyle}>
+                    <div style={fieldMargin}>
+                        <label style={labelStyle}>FULL_NAME_IDENTIFIER</label>
                         <input
                             type="text"
                             required
-                            placeholder="e.g. John Doe"
+                            placeholder="E.G. COMMANDER_SHEPARD"
                             value={formData.name}
                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                            style={{
-                                width: '100%',
-                                backgroundColor: 'rgba(255,255,255,0.03)',
-                                border: '1px solid rgba(255,255,255,0.1)',
-                                borderRadius: '10px',
-                                padding: '16px',
-                                color: 'white',
-                                fontSize: '1rem',
-                                outline: 'none'
-                            }}
+                            style={inputStyle}
                         />
                     </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px', marginBottom: '40px' }}>
+                    <div style={gridStyle}>
                         <div>
-                            <label style={{ display: 'block', color: '#4cc9f0', fontSize: '0.75rem', fontWeight: '800', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '1px' }}>
-                                Assigned Role
-                            </label>
+                            <label style={labelStyle}>PRIMARY_DESIGNATION</label>
                             <select
                                 required
                                 value={formData.role}
                                 onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                                style={{
-                                    width: '100%',
-                                    backgroundColor: 'rgba(11, 13, 23, 0.9)',
-                                    border: '1px solid rgba(255,255,255,0.1)',
-                                    borderRadius: '10px',
-                                    padding: '16px',
-                                    color: 'white',
-                                    fontSize: '1rem',
-                                    outline: 'none',
-                                    appearance: 'none',
-                                    cursor: 'pointer'
-                                }}
+                                style={selectStyle}
                             >
-                                <option value="" disabled>SELECT ROLE...</option>
+                                <option value="" disabled>SELECT_ROLE...</option>
                                 {roles.map(r => <option key={r} value={r}>{r.toUpperCase()}</option>)}
                             </select>
                         </div>
 
                         <div>
-                            <label style={{ display: 'block', color: '#4cc9f0', fontSize: '0.75rem', fontWeight: '800', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '1px' }}>
-                                Current Rank
-                            </label>
+                            <label style={labelStyle}>CURRENT_COMMISSION_RANK</label>
                             <input
                                 type="text"
                                 required
-                                placeholder="e.g. Lieutenant"
+                                placeholder="E.G. LIEUTENANT"
                                 value={formData.rank}
                                 onChange={(e) => setFormData({ ...formData, rank: e.target.value })}
-                                style={{
-                                    width: '100%',
-                                    backgroundColor: 'rgba(255,255,255,0.03)',
-                                    border: '1px solid rgba(255,255,255,0.1)',
-                                    borderRadius: '10px',
-                                    padding: '16px',
-                                    color: 'white',
-                                    fontSize: '1rem',
-                                    outline: 'none'
-                                }}
+                                style={inputStyle}
                             />
                         </div>
                     </div>
 
                     {error && (
-                        <div style={{
-                            color: '#f72585',
-                            backgroundColor: 'rgba(247, 37, 133, 0.1)',
-                            padding: '20px',
-                            borderRadius: '10px',
-                            marginBottom: '30px',
-                            fontSize: '0.9rem',
-                            border: '1px solid rgba(247, 37, 133, 0.3)',
-                            fontWeight: 'bold'
-                        }}>
-                            ⚠️ ENLISTMENT FAILED: {error}
+                        <div style={errorBox}>
+                            ⚠️ UPLINK_ERROR: {error.toUpperCase()}
                         </div>
                     )}
 
                     <button
                         type="submit"
                         disabled={loading}
-                        style={{
-                            width: '100%',
-                            backgroundColor: loading ? 'rgba(255,255,255,0.1)' : '#4cc9f0',
-                            color: loading ? 'rgba(255,255,255,0.3)' : '#0b0d17',
-                            padding: '18px',
-                            borderRadius: '12px',
-                            border: 'none',
-                            fontSize: '1rem',
-                            fontWeight: 'bold',
-                            cursor: loading ? 'not-allowed' : 'pointer',
-                            transition: 'all 0.3s ease',
-                            textTransform: 'uppercase',
-                            letterSpacing: '2px',
-                            boxShadow: loading ? 'none' : '0 10px 30px rgba(76, 201, 240, 0.3)'
-                        }}
+                        className="enlist-btn"
+                        style={submitBtnStyle(loading)}
                     >
-                        {loading ? 'PROCESSING RECORDS...' : 'REGISTER OFFICER'}
+                        {loading ? 'UPLOADING_RECORDS...' : 'CONFIRM_ENLISTMENT'}
                     </button>
                 </form>
             </div>
+
+            <style dangerouslySetInnerHTML={{ __html: `
+                @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Orbitron:wght@900&display=swap');
+                .enlist-btn:hover { background: #00ffd5 !important; color: #000 !important; box-shadow: 0 0 30px #00ffd5; }
+                input:focus, select:focus { border-color: #00ffd5 !important; outline: none; }
+            `}} />
         </CosmoLayout>
     );
 }
 
+/* --- THEME STYLES --- */
+const containerStyle: React.CSSProperties = { padding: '60px', backgroundColor: '#000', minHeight: '100vh', color: '#fff', fontFamily: "'JetBrains Mono', monospace" };
+const headerStyle = { marginBottom: '50px', borderBottom: '1px solid #222', paddingBottom: '30px' };
+const titleStyle = { color: '#fff', fontSize: '2rem', fontWeight: 900, fontFamily: "'Orbitron', sans-serif", letterSpacing: '2px' };
+const subTitleStyle = { color: '#00ffd5', fontSize: '0.75rem', fontWeight: 700, marginTop: '10px' };
+const formBoxStyle = { maxWidth: '800px', background: '#080808', padding: '40px', border: '1px solid #1a1a1a' };
+const fieldMargin = { marginBottom: '30px' };
+const gridStyle = { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px', marginBottom: '40px' };
+const labelStyle = { display: 'block', color: '#555', fontSize: '0.65rem', fontWeight: 800, marginBottom: '12px', letterSpacing: '2px' };
+const inputStyle = { width: '100%', backgroundColor: '#000', border: '1px solid #333', padding: '16px', color: '#fff', fontSize: '0.9rem', fontFamily: "'JetBrains Mono', monospace", boxSizing: 'border-box' as const };
+const selectStyle = { ...inputStyle, cursor: 'pointer', appearance: 'none' as const };
+const errorBox = { color: '#ff0055', border: '1px solid #ff0055', padding: '20px', marginBottom: '30px', fontSize: '0.8rem', fontWeight: 800 };
+const submitBtnStyle = (loading: boolean) => ({ width: '100%', backgroundColor: loading ? '#222' : '#fff', color: '#000', padding: '20px', border: 'none', fontSize: '0.9rem', fontWeight: 900, cursor: loading ? 'not-allowed' : 'pointer', letterSpacing: '2px', transition: '0.3s' });

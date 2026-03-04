@@ -28,7 +28,7 @@ SELECT
     m.mission_id,
     m.name,
     m.status,
-    COUNT(mc.astronaut_id) as crew_count
+    COUNT(mc.astronaut_name) as crew_count
 FROM mission m
 LEFT JOIN mission_crew mc ON m.mission_id = mc.mission_id
 GROUP BY m.mission_id, m.name, m.status;

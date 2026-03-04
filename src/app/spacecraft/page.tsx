@@ -1,16 +1,17 @@
 import Link from 'next/link';
 import { pool } from '@/src/lib/db';
 import CosmoLayout from '@/src/components/CosmoLayout';
+import OrbitalTracker from '@/src/components/OrbitalTracker';
 
 async function getSpacecraft() {
     try {
         const result = await pool.query(`
-      SELECT s.spacecraft_id, s.name, s.model, s.fuel_level, s.health_status, s.mission_id, m.name as mission_name
-      FROM spacecraft s
-      LEFT JOIN mission m ON s.mission_id = m.mission_id
-      ORDER BY s.name
-    `);
-        return result.rows;
+            SELECT s.spacecraft_id, s.name, s.model, m.fuel_level, s.health_status, s.mission_id, m.mission_name
+            FROM spacecraft s
+            LEFT JOIN mission_dashboard m ON s.mission_id = m.mission_id
+            ORDER BY s.name
+        `);
+        return result.rows || [];
     } catch (err) {
         console.error("Spacecraft Hangar DB Error:", err);
         return [];
@@ -22,105 +23,105 @@ export default async function SpacecraftPage() {
 
     return (
         <CosmoLayout>
-            <div style={{ padding: '60px', color: 'white', fontFamily: 'sans-serif' }}>
-                <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '20px' }}>
+            <div style={pageContainer}>
+                {/* --- 3D VISUALIZER SECTION --- */}
+                <OrbitalTracker ships={ships} />
+
+                <header style={headerNav}>
                     <div>
-                        <h1 style={{ margin: 0, fontSize: '2.5rem', fontWeight: '800', color: '#4cc9f0', letterSpacing: '-1px' }}>FLEET DIRECTORY</h1>
-                        <p style={{ color: 'rgba(255,255,255,0.5)', margin: '5px 0 0 0', textTransform: 'uppercase', letterSpacing: '2px', fontSize: '0.8rem' }}>ACTIVE SPACE ASSETS: {ships.length}</p>
+                        <h1 style={titleStyle}>FLEET_DIRECTORY</h1>
+                        <p style={subTitleStyle}>ACTIVE_ASSETS // {ships.length} UNITS_IN_SERVICE</p>
                     </div>
 
-                    <Link href="/spacecraft/new" style={{
-                        padding: '14px 28px',
-                        backgroundColor: '#4cc9f0',
-                        color: '#0b0d17',
-                        textDecoration: 'none',
-                        borderRadius: '10px',
-                        fontWeight: 'bold',
-                        fontSize: '0.9rem',
-                        textTransform: 'uppercase',
-                        letterSpacing: '1px',
-                        boxShadow: '0 0 20px rgba(76, 201, 240, 0.3)'
-                    }}>
-                        + Register Vessel
+                    <Link href="/spacecraft/new" className="tactical-btn" style={primaryBtn}>
+                        REGISTER_VESSEL +
                     </Link>
                 </header>
 
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '30px' }}>
+                <div style={gridContainer}>
                     {ships.map((s: any) => (
-                        <div key={s.spacecraft_id} style={{
-                            backgroundColor: 'rgba(27, 29, 41, 0.7)',
-                            backdropFilter: 'blur(10px)',
-                            padding: '30px',
-                            borderRadius: '20px',
-                            border: '1px solid rgba(255,255,255,0.05)',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            justifyContent: 'space-between'
-                        }}>
-                            <div>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '15px' }}>
-                                    <h3 style={{ margin: 0, fontSize: '1.4rem', fontWeight: '700' }}>{s.name}</h3>
-                                    <span style={{
-                                        fontSize: '0.65rem',
-                                        backgroundColor: 'rgba(76, 201, 240, 0.1)',
-                                        padding: '4px 10px',
-                                        borderRadius: '20px',
-                                        color: '#4cc9f0',
-                                        fontWeight: '800',
-                                        border: '1px solid rgba(76, 201, 240, 0.5)'
-                                    }}>#{s.spacecraft_id}</span>
-                                </div>
-                                <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.9rem', margin: '0 0 25px 0', textTransform: 'uppercase', letterSpacing: '1px' }}>{s.model || 'Unknown Class'}</p>
-
-                                <div style={{ marginBottom: '25px' }}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '0.8rem', fontWeight: 'bold' }}>
-                                        <span style={{ color: 'rgba(255,255,255,0.7)' }}>FUEL RESERVES</span>
-                                        <span style={{ color: s.fuel_level < 20 ? '#f72585' : '#4cc9f0' }}>{s.fuel_level}%</span>
-                                    </div>
-                                    <div style={{ width: '100%', height: '6px', backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: '3px', overflow: 'hidden' }}>
-                                        <div style={{
-                                            width: `${s.fuel_level}%`,
-                                            height: '100%',
-                                            backgroundColor: s.fuel_level < 20 ? '#f72585' : '#4cc9f0',
-                                            boxShadow: `0 0 10px ${s.fuel_level < 20 ? '#f72585' : '#4cc9f0'}`
-                                        }} />
-                                    </div>
-                                </div>
-
-                                <p style={{ margin: 0, fontSize: '0.85rem', color: 'rgba(255,255,255,0.7)' }}>
-                                    <span style={{ color: '#4cc9f0', fontWeight: 'bold' }}>ASSIGNED TO:</span> {s.mission_name || 'UNASSIGNED'}
-                                </p>
+                        <div key={s.spacecraft_id} className="tactical-card" style={cardStyle}>
+                            <div style={cardGlow}></div>
+                            <div style={cardTop}>
+                                <h3 style={shipNameStyle}>{s.name}</h3>
+                                <span style={idBadge}>ID_{s.spacecraft_id.toString().padStart(3, '0')}</span>
                             </div>
 
-                            <div style={{ marginTop: '30px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '20px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-                                <span style={{
-                                    color: s.health_status === 'Operational' ? '#10b981' : '#f72585',
-                                    fontSize: '0.75rem',
-                                    fontWeight: '800',
-                                    textTransform: 'uppercase',
-                                    letterSpacing: '1px',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '6px'
-                                }}>
-                                    <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: s.health_status === 'Operational' ? '#10b981' : '#f72585', boxShadow: `0 0 10px ${s.health_status === 'Operational' ? '#10b981' : '#f72585'}` }} />
-                                    {s.health_status}
-                                </span>
-                                <Link href={`/api/telemetry?spacecraft_id=${s.spacecraft_id}`} style={{
-                                    color: '#4cc9f0',
-                                    fontSize: '0.8rem',
-                                    textDecoration: 'none',
-                                    fontWeight: 'bold',
-                                    letterSpacing: '1px'
-                                }}>
-                                    TELEMETRY LINK →
+                            <p style={modelStyle}>{s.model || 'CLASSIFIED_CLASS'}</p>
+
+                            <div style={fuelContainer}>
+                                <div style={fuelLabelRow}>
+                                    <span style={labelStyle}>FUEL_RESERVES</span>
+                                    <span style={{ ...valueStyle, color: s.fuel_level < 20 ? '#ff0055' : '#00ffd5' }}>
+                                        {s.fuel_level}%
+                                    </span>
+                                </div>
+                                <div style={progressBarBg}>
+                                    <div style={{
+                                        width: `${s.fuel_level}%`,
+                                        height: '100%',
+                                        backgroundColor: s.fuel_level < 20 ? '#ff0055' : '#00ffd5',
+                                        boxShadow: `0 0 10px ${s.fuel_level < 20 ? '#ff0055' : '#00ffd5'}`
+                                    }} />
+                                </div>
+                            </div>
+
+                            <div style={missionInfo}>
+                                <span style={labelStyle}>ASSIGNMENT</span>
+                                <p style={missionText}>{s.mission_name || 'STANDBY_HANGAR'}</p>
+                            </div>
+
+                            {/* --- MODIFIED FOOTER WITH TWO LINKS --- */}
+                            <div style={cardFooter}>
+                                <Link href={`/health/${s.spacecraft_id}`} style={{ textDecoration: 'none' }}>
+                                    <div style={statusWrapper}>
+                                        <div style={statusDot(s.health_status)} />
+                                        <span style={statusText(s.health_status)}>BIO_LINK</span>
+                                    </div>
+                                </Link>
+
+                                <Link href={`/telemetry/${s.spacecraft_id}`} className="telemetry-hover" style={telemetryLink}>
+                                    SYSTEM_UPLINK →
                                 </Link>
                             </div>
                         </div>
                     ))}
                 </div>
             </div>
+
+            <style dangerouslySetInnerHTML={{
+                __html: `
+                @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;800&family=Orbitron:wght@700;900&display=swap');
+                .tactical-btn:hover { background: #00ffd5 !important; color: #000 !important; box-shadow: 0 0 20px #00ffd5; }
+                .tactical-card:hover { border-color: #00ffd5 !important; background: rgba(255,255,255,0.02) !important; }
+                .telemetry-hover:hover { color: #00ffd5 !important; text-shadow: 0 0 10px #00ffd5; }
+            `}} />
         </CosmoLayout>
     );
 }
 
+/* --- STYLES --- */
+const pageContainer: React.CSSProperties = { padding: "60px", backgroundColor: "#000", minHeight: "100vh", color: "#FFF", fontFamily: "'JetBrains Mono', monospace" };
+const headerNav: React.CSSProperties = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '50px', borderBottom: '1px solid #222', paddingBottom: '30px' };
+const titleStyle = { margin: 0, fontSize: '2rem', fontWeight: 900, fontFamily: "'Orbitron', sans-serif", letterSpacing: '2px' };
+const subTitleStyle = { color: '#00ffd5', margin: '5px 0 0 0', fontSize: '0.75rem', fontWeight: 800 };
+const primaryBtn = { padding: '12px 24px', backgroundColor: '#FFF', color: '#000', textDecoration: 'none', fontWeight: 800, fontSize: '0.8rem', letterSpacing: '1px' };
+const gridContainer: React.CSSProperties = { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '25px' };
+const cardStyle: React.CSSProperties = { background: '#080808', border: '1px solid #222', padding: '30px', position: 'relative' };
+const cardGlow = { position: 'absolute' as const, top: 0, left: 0, width: '100%', height: '2px', background: 'linear-gradient(90deg, transparent, #00ffd5, transparent)', opacity: 0.2 };
+const cardTop = { display: 'flex', justifyContent: 'space-between', marginBottom: '10px' };
+const shipNameStyle = { margin: 0, fontSize: '1.2rem', fontWeight: 800, fontFamily: "'Orbitron', sans-serif" };
+const idBadge = { fontSize: '0.65rem', color: '#555', fontWeight: 800 };
+const modelStyle = { fontSize: '0.75rem', color: '#AAA', marginBottom: '30px', letterSpacing: '1px' };
+const fuelContainer = { marginBottom: '25px' };
+const fuelLabelRow = { display: 'flex', justifyContent: 'space-between', marginBottom: '8px' };
+const labelStyle = { fontSize: '0.6rem', color: '#555', fontWeight: 800, letterSpacing: '1px' };
+const valueStyle = { fontSize: '0.8rem', fontWeight: 800 };
+const progressBarBg = { width: '100%', height: '4px', backgroundColor: '#111' };
+const missionInfo = { marginBottom: '30px' };
+const missionText = { margin: '5px 0 0 0', fontSize: '0.85rem', color: '#FFF' };
+const cardFooter: React.CSSProperties = { display: 'flex', justifyContent: 'space-between', borderTop: '1px solid #1a1a1a', paddingTop: '20px', alignItems: 'center' };
+const statusWrapper = { display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' };
+const statusDot = (s: string) => ({ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: s === 'Operational' ? '#00ffd5' : '#ff0055', boxShadow: `0 0 8px ${s === 'Operational' ? '#00ffd5' : '#ff0055'}` });
+const statusText = (s: string) => ({ fontSize: '0.7rem', fontWeight: 800, color: s === 'Operational' ? '#00ffd5' : '#ff0055', letterSpacing: '1px' });
+const telemetryLink = { color: '#FFF', textDecoration: 'none', fontSize: '0.7rem', fontWeight: 800, letterSpacing: '1px', transition: '0.2s' };

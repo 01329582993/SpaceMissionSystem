@@ -8,10 +8,11 @@ export const pool = new Pool({
   port: parseInt(process.env.DB_PORT || "5432"),
 });
 
-export default pool;
-
-
+// Logic to check connection on boot
 pool.query("SELECT NOW()", (err, res) => {
   if (err) console.error("DB connection failed:", err);
   else console.log("DB connected! Current time:", res.rows[0].now);
 });
+
+// THIS LINE FIXES YOUR ERROR:
+export default pool;

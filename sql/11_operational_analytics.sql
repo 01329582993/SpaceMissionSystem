@@ -22,9 +22,10 @@ crew_stats AS (
 fleet_stats AS (
     SELECT 
         COUNT(*) as total_spacecraft,
-        ROUND(AVG(fuel_level), 1) as avg_fuel_level,
+        ROUND(AVG(m.fuel_level), 1) as avg_fuel_level,
         COUNT(*) FILTER (WHERE health_status = 'Operational') as operational_vessels
-    FROM spacecraft
+    FROM spacecraft s
+    LEFT JOIN mission m ON s.mission_id = m.mission_id
 )
 SELECT 
     m.*, 

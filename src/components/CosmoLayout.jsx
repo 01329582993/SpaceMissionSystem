@@ -13,126 +13,158 @@ const navItems = [
   { name: "Logs", href: "/logs" },
 ];
 
-
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-      delayChildren: 0.3,
-    },
+    transition: { staggerChildren: 0.05, delayChildren: 0.1 },
   },
 };
 
 const itemVariants = {
-  hidden: { opacity: 0, x: -30 },
+  hidden: { opacity: 0, x: -20 },
   visible: {
     opacity: 1,
     x: 0,
-    transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] }
+    transition: { duration: 0.5, ease: "easeOut" }
   },
 };
 
 export default function CosmoLayout({ children }) {
   const pathname = usePathname();
+  const isDashboard = pathname === "/dashboard" || pathname === "/";
 
   return (
-    <div className="flex h-screen w-full bg-black overflow-hidden font-sans">
-
-
-      <aside className="relative w-[320px] h-full bg-[#050b18] border-r border-white/5 flex-shrink-0">
-
-
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,_rgba(59,130,246,0.1),transparent_70%)]" />
-
-
+    <div className="flex h-screen w-full bg-black overflow-hidden font-sans text-white selection:bg-cyan-500/30">
+      
+      {/* --- NEW SIDEBAR DESIGN --- */}
+      <aside className="relative w-[320px] h-full bg-[#080808] border-r border-white/5 flex-shrink-0 z-30 shadow-2xl">
+        
         <motion.div
-          className="relative z-10 flex h-full flex-col pl-10 pt-16"
+          className="relative z-10 flex h-full flex-col px-10 pt-16"
           variants={containerVariants}
           initial="hidden"
           animate="visible"
         >
-
-
-          <motion.div variants={itemVariants} className="mb-12">
-            <h1 className="text-[32px] font-bold tracking-tighter leading-none bg-clip-text text-transparent bg-gradient-to-r from-[#6ee7ff] via-[#3b82f6] to-[#9333ea]">
-              CosmoTrack
+          {/* BRANDING: Stark & Modern */}
+          <motion.div variants={itemVariants} className="mb-20">
+            <h1 className="text-[32px] font-black tracking-tight leading-none text-white flex items-center gap-2">
+              <span className="w-2 h-8 bg-cyan-400 block"></span>
+              COSMO_TRACK
             </h1>
-
-            <p className="mt-2 text-[14px] font-light tracking-wide text-white/50">
-              EST. 2026
-            </p>
+            <div className="flex items-center gap-2 mt-2">
+              <span className="text-[10px] font-mono tracking-[0.5em] text-cyan-400/80 uppercase">
+              
+              </span>
+            </div>
           </motion.div>
 
-          <nav className="flex flex-col gap-6">
+          {/* NAV LINKS: Added Gap here */}
+          <nav className="flex flex-col gap-12"> 
             {navItems.map((item) => {
-              const isActive = pathname === item.href;
+              const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
 
               return (
                 <motion.div
                   key={item.name}
                   variants={itemVariants}
-                  whileHover={{ x: 8 }}
-                  whileTap={{ scale: 0.98 }}
+                  whileHover={{ x: 5 }}
                 >
-                  <Link
-                    href={item.href}
-                    className="group relative inline-block no-underline"
-                  >
-
+                  <Link href={item.href} className="group flex items-center no-underline">
                     <span
-                      className={`
-                        text-[18px] 
-                        font-medium
-                        tracking-tight
-                        transition-all
-                        duration-500
-                        ease-out
-                        block
-                      `}
-                      style={{
-                        color: isActive ? "#6ee7ff" : "white",
-                        opacity: isActive ? 1 : 0.6
-                      }}
+                      className={`text-[18px] font-bold tracking-widest transition-all duration-200 block uppercase ${
+                        isActive 
+                          ? "text-white scale-110 origin-left" 
+                          : "text-neutral-600 group-hover:text-neutral-300"
+                      }`}
+                      style={{ color: isActive ? '#ffffff' : undefined }} // Forced override for purple bugs
                     >
                       {item.name}
-
-
-                      <motion.span
-                        className="absolute -bottom-1 left-0 h-[1px] bg-gradient-to-r from-[#6ee7ff] to-transparent"
-                        initial={{ width: 0 }}
-                        animate={{ width: isActive ? "100%" : 0 }}
-                        whileHover={{ width: "100%" }}
-                        transition={{ duration: 0.4 }}
-                      />
                     </span>
+                    
+                    {isActive && (
+                      <motion.div 
+                        layoutId="activeDot"
+                        className="ml-auto w-1.5 h-1.5 bg-cyan-400 rounded-full shadow-[0_0_8px_#22d3ee]"
+                      />
+                    )}
                   </Link>
                 </motion.div>
               );
             })}
           </nav>
+
+          {/* SYSTEM METRICS FOOTER */}
+          <motion.div variants={itemVariants} className="mt-auto pb-10">
+             <div className="p-4 border border-white/5 bg-white/[0.02] rounded-sm">
+                <div className="flex justify-between items-center mb-1">
+                  <span className="text-[9px] font-mono text-neutral-500 uppercase tracking-widest"></span>
+                  <span className="text-[9px] font-mono text-cyan-400"></span>
+                </div>
+                <div className="w-full h-[1px] bg-white/10 relative overflow-hidden">
+                   <motion.div 
+                    initial={{ x: "-100%" }}
+                    animate={{ x: "100%" }}
+                    transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
+                    className="absolute inset-0 w-1/2 bg-cyan-400/50"
+                   />
+                </div>
+             </div>
+          </motion.div>
         </motion.div>
       </aside>
 
+      {/* --- MAIN CONTENT AREA --- */}
+      <main className="relative flex-1 h-full overflow-hidden bg-black flex flex-col">
+        
+        {/* HEADER BAR */}
+        <div className="h-16 border-bottom border-white/5 flex items-center px-12 justify-between bg-[#050505] z-20">
+           <span className="text-[10px] font-mono text-neutral-500 uppercase tracking-[0.3em]">
+             Sector: 07 // {pathname.replace('/', '') || 'root'}
+           </span>
+           <div className="flex items-center gap-6">
+              <span className="text-[10px] font-mono text-neutral-500">24.0049° N, 38.2201° E</span>
+              <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_#22c55e]"></div>
+           </div>
+        </div>
 
-      <main className="relative flex-1 h-full overflow-y-auto overflow-x-hidden">
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="fixed inset-0 h-full w-full object-cover -z-10"
-        >
-          <source src="/videos/cosmo.mp4" type="video/mp4" />
-        </video>
-
-        <div className="fixed inset-0 bg-black/60 -z-10" />
-
-        <div className="relative z-10 w-full min-h-full">
+        {/* CONTENT */}
+        <div className="relative z-10 w-full h-full overflow-y-auto bg-black p-12 scroll-smooth">
           {children}
         </div>
+
       </main>
+
+      {/* GLOBAL CSS OVERRIDES */}
+      <style jsx global>{`
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap');
+        
+        body {
+          font-family: 'Inter', sans-serif;
+          background-color: black;
+          color: white;
+        }
+
+        /* Prevent that purple link behavior */
+        a, a:visited, a:active {
+          color: inherit;
+          text-decoration: none;
+        }
+
+        /* Custom scrollbar to keep it stealthy */
+        ::-webkit-scrollbar {
+          width: 5px;
+        }
+        ::-webkit-scrollbar-track {
+          background: #000;
+        }
+        ::-webkit-scrollbar-thumb {
+          background: #1a1a1a;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+          background: #333;
+        }
+      `}</style>
     </div>
   );
 }
