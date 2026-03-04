@@ -163,14 +163,14 @@ const container: any = { padding: "40px", backgroundColor: "#000", minHeight: "1
 const header = { display: 'flex', justifyContent: 'space-between', marginBottom: '40px', borderBottom: '1px solid #1a1a1a', paddingBottom: '20px' };
 const titleStyle = { margin: 0, fontSize: '1.4rem', letterSpacing: '2px' };
 const subTitle = { color: '#666', fontSize: '0.7rem', marginTop: '5px' };
-const backBtn = { background: '#111', border: '1px solid #333', color: '#FFF', padding: '8px 15px', cursor: 'pointer', fontSize: '0.7rem' };
+const backBtn = { background: '#111', border: '1px solid #ffffff', color: '#FFF', padding: '8px 15px', cursor: 'pointer', fontSize: '0.7rem' };
 
 const layoutGrid = { display: 'grid', gridTemplateColumns: '1fr 350px', gap: '40px' };
 const inputPanel = { background: '#050505', border: '1px solid #111', padding: '30px' };
-const sectionHeader = { fontSize: '0.8rem', color: '#444', marginBottom: '25px', letterSpacing: '2px' };
+const sectionHeader = { fontSize: '0.8rem', color: '#fff8f8', marginBottom: '25px', letterSpacing: '2px' };
 
 const inputGroup = { marginBottom: '25px' };
-const label = { display: 'block', fontSize: '0.65rem', color: '#555', marginBottom: '10px', letterSpacing: '1px' };
+const label = { display: 'block', fontSize: '0.65rem', color: '#ffffff', marginBottom: '10px', letterSpacing: '1px' };
 const numInput = { width: '100%', background: '#000', border: '1px solid #222', padding: '12px', color: '#00ffd5', fontSize: '0.8rem', outline: 'none' };
 const slider = { width: '100%', cursor: 'pointer' };
 const inputValue = { fontSize: '0.7rem', color: '#00ffd5', marginTop: '5px', textAlign: 'right' as const };
@@ -183,9 +183,9 @@ const scoreValue = { fontSize: '4rem', fontWeight: 'bold' as const, margin: '10p
 const scoreSub = { fontSize: '0.6rem', letterSpacing: '2px' };
 
 const terminalCard = { background: '#080808', border: '1px solid #111', padding: '20px', flexGrow: 1 };
-const terminalScroll = { height: '200px', overflowY: 'auto' as const, fontSize: '0.65rem', color: '#444' };
+const terminalScroll = { height: '200px', overflowY: 'auto' as const, fontSize: '0.65rem', color: '#fafafa' };
 const logLine = { marginBottom: '8px', borderLeft: '2px solid #222', paddingLeft: '8px' };
 
-const quickStats = { background: '#0a0a0a', padding: '20px', fontSize: '0.7rem', color: '#555' };
+const quickStats = { background: '#0a0a0a', padding: '20px', fontSize: '0.7rem', color: '#ffffff' };
 const statLine = { display: 'flex', justifyContent: 'space-between', marginBottom: '8px' };
 const loaderStyle: any = { color: '#00ffd5', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#000' };
