@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 
 const navItems = [
   { name: "Dashboard", href: "/dashboard" },
+  { name: "Celestial", href: "/celestial" },
   { name: "Missions", href: "/missions" },
   { name: "Fleet", href: "/spacecraft" },
   { name: "Personnel", href: "/personnel" },
@@ -36,10 +37,10 @@ export default function CosmoLayout({ children }) {
 
   return (
     <div className="flex h-screen w-full bg-black overflow-hidden font-sans text-white selection:bg-cyan-500/30">
-      
+
       {/* --- NEW SIDEBAR DESIGN --- */}
       <aside className="relative w-[320px] h-full bg-[#080808] border-r border-white/5 flex-shrink-0 z-30 shadow-2xl">
-        
+
         <motion.div
           className="relative z-10 flex h-full flex-col px-10 pt-16"
           variants={containerVariants}
@@ -54,13 +55,13 @@ export default function CosmoLayout({ children }) {
             </h1>
             <div className="flex items-center gap-2 mt-2">
               <span className="text-[10px] font-mono tracking-[0.5em] text-cyan-400/80 uppercase">
-              
+
               </span>
             </div>
           </motion.div>
 
           {/* NAV LINKS: Added Gap here */}
-          <nav className="flex flex-col gap-12"> 
+          <nav className="flex flex-col gap-12">
             {navItems.map((item) => {
               const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
 
@@ -72,18 +73,17 @@ export default function CosmoLayout({ children }) {
                 >
                   <Link href={item.href} className="group flex items-center no-underline">
                     <span
-                      className={`text-[18px] font-bold tracking-widest transition-all duration-200 block uppercase ${
-                        isActive 
-                          ? "text-white scale-110 origin-left" 
+                      className={`text-[18px] font-bold tracking-widest transition-all duration-200 block uppercase ${isActive
+                          ? "text-white scale-110 origin-left"
                           : "text-neutral-600 group-hover:text-neutral-300"
-                      }`}
+                        }`}
                       style={{ color: isActive ? '#ffffff' : undefined }} // Forced override for purple bugs
                     >
                       {item.name}
                     </span>
-                    
+
                     {isActive && (
-                      <motion.div 
+                      <motion.div
                         layoutId="activeDot"
                         className="ml-auto w-1.5 h-1.5 bg-cyan-400 rounded-full shadow-[0_0_8px_#22d3ee]"
                       />
@@ -96,36 +96,36 @@ export default function CosmoLayout({ children }) {
 
           {/* SYSTEM METRICS FOOTER */}
           <motion.div variants={itemVariants} className="mt-auto pb-10">
-             <div className="p-4 border border-white/5 bg-white/[0.02] rounded-sm">
-                <div className="flex justify-between items-center mb-1">
-                  <span className="text-[9px] font-mono text-neutral-500 uppercase tracking-widest"></span>
-                  <span className="text-[9px] font-mono text-cyan-400"></span>
-                </div>
-                <div className="w-full h-[1px] bg-white/10 relative overflow-hidden">
-                   <motion.div 
-                    initial={{ x: "-100%" }}
-                    animate={{ x: "100%" }}
-                    transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
-                    className="absolute inset-0 w-1/2 bg-cyan-400/50"
-                   />
-                </div>
-             </div>
+            <div className="p-4 border border-white/5 bg-white/[0.02] rounded-sm">
+              <div className="flex justify-between items-center mb-1">
+                <span className="text-[9px] font-mono text-neutral-500 uppercase tracking-widest"></span>
+                <span className="text-[9px] font-mono text-cyan-400"></span>
+              </div>
+              <div className="w-full h-[1px] bg-white/10 relative overflow-hidden">
+                <motion.div
+                  initial={{ x: "-100%" }}
+                  animate={{ x: "100%" }}
+                  transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
+                  className="absolute inset-0 w-1/2 bg-cyan-400/50"
+                />
+              </div>
+            </div>
           </motion.div>
         </motion.div>
       </aside>
 
       {/* --- MAIN CONTENT AREA --- */}
       <main className="relative flex-1 h-full overflow-hidden bg-black flex flex-col">
-        
+
         {/* HEADER BAR */}
         <div className="h-16 border-bottom border-white/5 flex items-center px-12 justify-between bg-[#050505] z-20">
-           <span className="text-[10px] font-mono text-neutral-500 uppercase tracking-[0.3em]">
-             Sector: 07 // {pathname.replace('/', '') || 'root'}
-           </span>
-           <div className="flex items-center gap-6">
-              <span className="text-[10px] font-mono text-neutral-500">24.0049° N, 38.2201° E</span>
-              <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_#22c55e]"></div>
-           </div>
+          <span className="text-[10px] font-mono text-neutral-500 uppercase tracking-[0.3em]">
+            Sector: 07 // {pathname.replace('/', '') || 'root'}
+          </span>
+          <div className="flex items-center gap-6">
+            <span className="text-[10px] font-mono text-neutral-500">24.0049° N, 38.2201° E</span>
+            <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_#22c55e]"></div>
+          </div>
         </div>
 
         {/* CONTENT */}
